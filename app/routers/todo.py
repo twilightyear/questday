@@ -2,7 +2,7 @@ from fastapi import HTTPException, APIRouter
 from sqlalchemy import select
 from starlette import status
 from database.db_connection import SessionFactory
-from models import Todo
+from models.todo import Todo
 from schema.request import TodoCreateRequest, TodoUpdateRequest
 from schema.response import TodoResponse
 

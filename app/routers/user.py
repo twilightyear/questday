@@ -2,7 +2,7 @@ from fastapi import APIRouter, status, HTTPException
 from sqlalchemy import select
 from schema.request import UserSignUpRequest, UserLoginRequest
 from database.db_connection import SessionFactory
-from models import User
+from models.user import User
 from auth.password import hash_password, verify_password
 from schema.response import UserSignUpResponse
 
