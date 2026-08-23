@@ -1,9 +1,9 @@
-from datetime import DateTime
+from datetime import datetime
 from pydantic import BaseModel
 
 #Todo 데이터 반환시의 데이터 형식 규칙
 class TodoResponse(BaseModel):
-    id: Integer
+    id: int
     title: str
     is_done: bool
 

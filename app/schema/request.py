@@ -8,7 +8,7 @@ class TodoCreateRequest(BaseModel): #할일 생성시의 데이터 규칙
 
 
 class TodoUpdateRequest(BaseModel): #할일 업데이트시의 데이터 규칙
-    title: str | None = HTTP_204_NO_CONTENT
+    title: str | None = None
     is_done: bool | None = None
 
 
