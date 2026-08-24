@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import Integer, String, Boolean, ForeignKey, DateTime, func
+from sqlalchemy import Integer, String, Boolean, ForeignKey, DateTime, func, ForeignKeyConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from database.orm import Base
 
@@ -11,8 +11,15 @@ class Daily(Base):
         autoincrement = True
     )
 
-    calendar_id: Mapped[int] = mapped_column(
-        ForeignKey("calendar.calendar_id")
+    user_id: Mapped[int] = mapped_column()
+    year: Mapped[int] = mapped_column()
+
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["user_id", "year"], 
+            ["calendar.user_id", "calendar.year"],
+            ondelete="CASCADE"
+        ),
     )
 
     calendar: Mapped["Calendar"] = relationship(
