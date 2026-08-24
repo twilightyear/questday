@@ -3,8 +3,7 @@ from schema.daily.response import DailyResponse
 
 
 class CalendarResponse(BaseModel):
-    calendar_id: int
-    title: str
+    year: int
     dailies: list[DailyResponse] = []
 
     class Config:

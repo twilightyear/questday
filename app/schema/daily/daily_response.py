@@ -3,8 +3,9 @@ from schema.todo.response import TodoResponse
 
 
 class DailyResponse(BaseModel):
-    daily_id: int
-    target_date: str
+    year: int
+    month: int
+    day: int
     todos: list[TodoResponse] = []
 
     class Config:

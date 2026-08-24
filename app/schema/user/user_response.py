@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from schema.calendar.response import CalendarResponse
+from schema.calendar.calendar_response import CalendarResponse
 
 
 class UserResponse(BaseModel):

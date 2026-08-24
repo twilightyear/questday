@@ -8,6 +8,7 @@ from schema.response import TodoResponse
 
 router = APIRouter(tags = ["Todo"]) #Todo 라우터
 
+"""
 #전체 할일 조회
 @router.get(
     "/todos",
@@ -106,4 +107,5 @@ def delete_todo_handler(todo_id: int):
             detail = "Todo no found"
         )
     finally:
-        session.close()
+        session.close()]
+"""
