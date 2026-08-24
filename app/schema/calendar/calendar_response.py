@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from schema.daily.response import DailyResponse
+from schema.daily.daily_response import DailyResponse
 
 
 class CalendarResponse(BaseModel):

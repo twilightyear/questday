@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from schema.todo.response import TodoResponse
+from schema.todo.todo_response import TodoResponse
 
 
 class DailyResponse(BaseModel):

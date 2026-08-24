@@ -3,8 +3,8 @@ from sqlalchemy import select
 from starlette import status
 from database.db_connection import SessionFactory
 from models.todo import Todo
-from schema.request import TodoCreateRequest, TodoUpdateRequest
-from schema.response import TodoResponse
+from schema.todo.todo_request import TodoCreateRequest, TodoUpdateRequest
+from schema.todo.todo_response import TodoResponse
 
 router = APIRouter(tags = ["Todo"]) #Todo 라우터
 

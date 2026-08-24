@@ -16,7 +16,7 @@ class User(Base):
     email: Mapped[str] = mapped_column(
         String(255),
         unique = True,
-        index = True, #목차생성
+        index = True,
         nullable = False
     )
 
@@ -27,7 +27,7 @@ class User(Base):
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime,
-        server_default = func.now(), #현재시간
+        server_default = func.now(),
         nullable = False
     )
 
