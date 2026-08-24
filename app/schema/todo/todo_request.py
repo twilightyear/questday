@@ -1,4 +1,3 @@
-import re
 from pydantic import BaseModel, EmailStr, Field, field_validator, ValidationError
 
 
