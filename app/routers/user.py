@@ -1,10 +1,10 @@
 from fastapi import APIRouter, status, HTTPException
 from sqlalchemy import select
-from schema.request import UserSignUpRequest, UserLoginRequest
 from database.db_connection import SessionFactory
-from models import User
+from models.user import User
 from auth.password import hash_password, verify_password
-from schema.response import UserSignUpResponse
+from schema.user.user_request import UserSignUpRequest, UserLoginRequest
+from schema.user.user_response import UserSignUpResponse
 
 router = APIRouter(tags=["User"]) #User 라우터
 

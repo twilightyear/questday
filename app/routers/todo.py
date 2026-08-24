@@ -2,12 +2,13 @@ from fastapi import HTTPException, APIRouter
 from sqlalchemy import select
 from starlette import status
 from database.db_connection import SessionFactory
-from models import Todo
-from schema.request import TodoCreateRequest, TodoUpdateRequest
-from schema.response import TodoResponse
+from models.todo import Todo
+from schema.todo.todo_request import TodoCreateRequest, TodoUpdateRequest
+from schema.todo.todo_response import TodoResponse
 
 router = APIRouter(tags = ["Todo"]) #Todo 라우터
 
+"""
 #전체 할일 조회
 @router.get(
     "/todos",
@@ -106,4 +107,5 @@ def delete_todo_handler(todo_id: int):
             detail = "Todo no found"
         )
     finally:
-        session.close()
+        session.close()]
+"""
