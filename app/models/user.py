@@ -7,8 +7,10 @@ from database.orm import Base
 class User(Base):
     __tablename__ = "user"
 
-    id: Mapped[int] = mapped_column(
-        primary_key = True
+    user_id: Mapped[int] = mapped_column(
+        Integer,
+        primary_key = True,
+        autoincrement = True
     )
 
     email: Mapped[str] = mapped_column(
@@ -24,12 +26,12 @@ class User(Base):
     )
 
     created_at: Mapped[datetime] = mapped_column(
-        DateTime, #시간
+        DateTime,
         server_default = func.now(), #현재시간
         nullable = False
     )
 
-    todos: Mapped[list["Todo"]] = relationship(
-        back_populates = "user", #할일 테이블과 관계 설정 (객체 연결)
-        cascade = "all, delete-orphan" #관련 테이블까지 전부 삭제
+    calendars: Mapped[list["Calendar"]] = relationship(
+        back_populates="user",
+        cascade = "all, delete-orphan"
     )

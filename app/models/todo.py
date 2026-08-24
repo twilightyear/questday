@@ -24,11 +24,11 @@ class Todo(Base):
         default = False
     )
 
-    user_id: Mapped[int] = mapped_column(
-        ForeignKey('user.id'), #사용자 테이블과 연결
+    daily_id: Mapped[int] = mapped_column(
+        ForeignKey('daily.daily_id'),
         nullable = True
     )
 
-    user: Mapped["User"] = relationship(
+    daily: Mapped["Daily"] = relationship(
         back_populates = "todos" #사용자 테이블과 관계 설정 (객체 연결)
     )
