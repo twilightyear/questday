@@ -20,6 +20,7 @@ def get_calendars_handler(user_id: int, session : Session = Depends(get_db)):
     calendars = session.execute(stmt).scalars().all()
     return calendars
 
+#user_id 에 해당하는 달력 생성
 @router.post(
     "/calendars",
     response_model = CalendarResponse,
@@ -47,3 +48,25 @@ def create_calendar_handler(body: CalendarCreateRequest, user_id: int, session :
 
     session.refresh(calendar)
     return calendar
+
+#user_id 에 해당하는 달력 삭제
+@router.delete(
+    "/calendars/{year}",
+    status_code=status.HTTP_204_NO_CONTENT
+)
+def delete_calendar_handler(year: int, user_id: int, session : Session = Depends(get_db)):
+    existing_calendar = session.query(Calendar).filter(
+        Calendar.year == year,
+        Calendar.user_id == user_id
+    ).first()
+
+    if not existing_calendar:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="존재하지 않는 달력입니다."
+        )
+
+    session.delete(existing_calendar)
+    session.commit()
+
+    return None
