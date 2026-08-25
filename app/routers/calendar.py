@@ -9,11 +9,12 @@ from sqlalchemy.orm import Session
 
 router = APIRouter(tags=["Calendar"])
 
-#user_id 에 해당하는 달력 가져오기
+#user_id 에 해당하는 달력 전부 가져오기
 @router.get(
-    "/calendars",
+    "/calendars/",
     response_model = list[CalendarResponse],
-    status_code = status.HTTP_200_OK
+    status_code = status.HTTP_200_OK,
+    summary = "특정 유저의 전체 달력 조회"
 )
 def get_calendars_handler(user_id: int, session : Session = Depends(get_db)):
     stmt = select(Calendar).where(Calendar.user_id == user_id)
@@ -27,7 +28,7 @@ def get_calendars_handler(user_id: int, session : Session = Depends(get_db)):
     status_code = status.HTTP_201_CREATED
 )
 def create_calendar_handler(body: CalendarCreateRequest, user_id: int, session : Session = Depends(get_db)):
-
+    #동일한 연도의 달력이 존재하는지 중복 검사 (409 CONFLICT)
     existing_calendar = session.query(Calendar).filter(
         Calendar.user_id == user_id,
         Calendar.year == body.year
@@ -43,10 +44,11 @@ def create_calendar_handler(body: CalendarCreateRequest, user_id: int, session :
         user_id = user_id,
         year = body.year
     )
+
     session.add(calendar)
     session.commit()
-
     session.refresh(calendar)
+
     return calendar
 
 #user_id 에 해당하는 달력 삭제
@@ -55,6 +57,7 @@ def create_calendar_handler(body: CalendarCreateRequest, user_id: int, session :
     status_code=status.HTTP_204_NO_CONTENT
 )
 def delete_calendar_handler(year: int, user_id: int, session : Session = Depends(get_db)):
+    #존재하는 달력인지 검사 (404 NOT FOUND)
     existing_calendar = session.query(Calendar).filter(
         Calendar.year == year,
         Calendar.user_id == user_id
