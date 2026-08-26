@@ -11,7 +11,7 @@ router = APIRouter(tags=["Calendar"])
 
 #user_id 에 해당하는 달력 전부 가져오기
 @router.get(
-    "/calendars/",
+    "/calendars",
     response_model = list[CalendarResponse],
     status_code = status.HTTP_200_OK,
     summary = "특정 유저의 전체 달력 조회"
@@ -21,11 +21,34 @@ def get_calendars_handler(user_id: int, session : Session = Depends(get_db)):
     calendars = session.execute(stmt).scalars().all()
     return calendars
 
+#user_id 에 해당하는 달력중에서 특정 달력만 가져오기
+@router.get(
+    "/calendars/{year}",
+    response_model = CalendarResponse,
+    status_code = status.HTTP_200_OK,
+    summary = "특정 유저의 특정 달력 조회"
+)
+def get_calendar_handler(user_id: int, year: int, session : Session = Depends(get_db)):
+    #존재하는 달력인지 검사 (404 NOT FOUND)
+    existing_calendar = session.query(Calendar).filter(
+        Calendar.year == year,
+        Calendar.user_id == user_id
+    ).first()
+
+    if not existing_calendar:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="존재하지 않는 달력입니다."
+        )
+
+    return existing_calendar
+
 #user_id 에 해당하는 달력 생성
 @router.post(
     "/calendars",
     response_model = CalendarResponse,
-    status_code = status.HTTP_201_CREATED
+    status_code = status.HTTP_201_CREATED,
+    summary = "특정 유저의 특정 달력 생성"
 )
 def create_calendar_handler(body: CalendarCreateRequest, user_id: int, session : Session = Depends(get_db)):
     #동일한 연도의 달력이 존재하는지 중복 검사 (409 CONFLICT)
@@ -54,7 +77,8 @@ def create_calendar_handler(body: CalendarCreateRequest, user_id: int, session :
 #user_id 에 해당하는 달력 삭제
 @router.delete(
     "/calendars/{year}",
-    status_code=status.HTTP_204_NO_CONTENT
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary = "특정 유저의 특정 달력 삭제"
 )
 def delete_calendar_handler(year: int, user_id: int, session : Session = Depends(get_db)):
     #존재하는 달력인지 검사 (404 NOT FOUND)
