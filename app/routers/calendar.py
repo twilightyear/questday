@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 
 router = APIRouter(tags=["Calendar"])
 
+
 #user_id 에 해당하는 달력 전부 가져오기
 @router.get(
     "/calendars",
@@ -20,6 +21,7 @@ def get_calendars_handler(user_id: int, session : Session = Depends(get_db)):
     stmt = select(Calendar).where(Calendar.user_id == user_id)
     calendars = session.execute(stmt).scalars().all()
     return calendars
+
 
 #user_id 에 해당하는 달력중에서 특정 달력만 가져오기
 @router.get(
@@ -42,6 +44,7 @@ def get_calendar_handler(user_id: int, year: int, session : Session = Depends(ge
         )
 
     return existing_calendar
+
 
 #user_id 에 해당하는 달력 생성
 @router.post(
@@ -74,6 +77,7 @@ def create_calendar_handler(body: CalendarCreateRequest, user_id: int, session :
 
     return calendar
 
+
 #user_id 에 해당하는 달력 삭제
 @router.delete(
     "/calendars/{year}",
@@ -97,3 +101,21 @@ def delete_calendar_handler(year: int, user_id: int, session : Session = Depends
     session.commit()
 
     return None
+
+
+#user_id 에 해당하는 달력 전부 삭제
+@router.delete(
+    "/calendars",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary = "특정 유저의 모든 달력 삭제"
+)
+def delete_calendars_handler(user_id: int, session : Session = Depends(get_db)):
+    stmt = select(Calendar).where(Calendar.user_id == user_id)
+    calendars = session.execute(stmt).scalars().all()
+
+    for calendar in calendars:
+        session.delete(calendar)
+    
+    session.commit()
+
+    return
