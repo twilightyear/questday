@@ -2,6 +2,7 @@ from fastapi import APIRouter, status, HTTPException, Depends
 from sqlalchemy import select
 from database.db_connection import SessionFactory, get_db
 from models.calendar import Calendar
+from models.user import User
 from auth.password import hash_password, verify_password
 from schema.calendar.calendar_request import CalendarCreateRequest, CalendarUpdateRequest
 from schema.calendar.calendar_response import CalendarResponse
@@ -105,11 +106,22 @@ def delete_calendar_handler(year: int, user_id: int, session : Session = Depends
 
 #user_id 에 해당하는 달력 전부 삭제
 @router.delete(
-    "/calendars",
+    "/users/{user_id}/calendars",
     status_code=status.HTTP_204_NO_CONTENT,
     summary = "특정 유저의 모든 달력 삭제"
 )
 def delete_calendars_handler(user_id: int, session : Session = Depends(get_db)):
+
+    existing_user = session.execute(
+        select(User).where(User.user_id == user_id)
+    ).scalar_one_or_none()
+
+    if not existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="존재하지 않는 사용자입니다."
+        )
+
     stmt = select(Calendar).where(Calendar.user_id == user_id)
     calendars = session.execute(stmt).scalars().all()
 
