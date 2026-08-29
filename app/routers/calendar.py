@@ -81,11 +81,23 @@ def create_calendar_handler(body: CalendarCreateRequest, user_id: int, session :
 
 #user_id 에 해당하는 달력 삭제
 @router.delete(
-    "/calendars/{year}",
+    "/users/{user_id}/calendars/{year}",
     status_code=status.HTTP_204_NO_CONTENT,
     summary = "특정 유저의 특정 달력 삭제"
 )
 def delete_calendar_handler(year: int, user_id: int, session : Session = Depends(get_db)):
+
+    #존재하는 사용자인지 검사 (404 NOT FOUND)
+    existing_user = session.execute(
+        select(User).where(User.user_id == user_id)
+    ).scalar_one_or_none()
+
+    if not existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="존재하지 않는 사용자입니다."
+        )
+
     #존재하는 달력인지 검사 (404 NOT FOUND)
     existing_calendar = session.query(Calendar).filter(
         Calendar.year == year,
@@ -111,7 +123,7 @@ def delete_calendar_handler(year: int, user_id: int, session : Session = Depends
     summary = "특정 유저의 모든 달력 삭제"
 )
 def delete_calendars_handler(user_id: int, session : Session = Depends(get_db)):
-
+    #존재하는 사용자인지 검사 (404 NOT FOUND)
     existing_user = session.execute(
         select(User).where(User.user_id == user_id)
     ).scalar_one_or_none()
