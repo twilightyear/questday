@@ -13,15 +13,36 @@ router = APIRouter(tags=["Calendar"])
 
 #user_id 에 해당하는 달력 전부 가져오기
 @router.get(
-    "/calendars",
+    "/users/{user_id}/calendars",
     response_model = list[CalendarResponse],
     status_code = status.HTTP_200_OK,
     summary = "특정 유저의 전체 달력 조회"
 )
 def get_calendars_handler(user_id: int, session : Session = Depends(get_db)):
-    stmt = select(Calendar).where(Calendar.user_id == user_id)
-    calendars = session.execute(stmt).scalars().all()
-    return calendars
+    #존재하는 사용자인지 검사 (404 NOT FOUND)
+    existing_user = session.execute(
+        select(User).where(User.user_id == user_id)
+    ).scalar_one_or_none()
+
+    if not existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="존재하지 않는 사용자입니다."
+        )
+    
+    #존재하는 달력인지 검사 (404 NOT FOUND)
+    existing_calendars = session.query(Calendar).filter(
+        Calendar.user_id == user_id
+    ).all()
+
+    if not existing_calendars:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="존재하는 달력이 없습니다."
+        )
+
+    return existing_calendars
+
 
 
 #user_id 에 해당하는 달력중에서 특정 달력만 가져오기
