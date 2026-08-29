@@ -26,12 +26,23 @@ def get_calendars_handler(user_id: int, session : Session = Depends(get_db)):
 
 #user_id 에 해당하는 달력중에서 특정 달력만 가져오기
 @router.get(
-    "/calendars/{year}",
+    "/users/{user_id}/calendars/{year}",
     response_model = CalendarResponse,
     status_code = status.HTTP_200_OK,
     summary = "특정 유저의 특정 달력 조회"
 )
 def get_calendar_handler(user_id: int, year: int, session : Session = Depends(get_db)):
+    #존재하는 사용자인지 검사 (404 NOT FOUND)
+    existing_user = session.execute(
+        select(User).where(User.user_id == user_id)
+    ).scalar_one_or_none()
+
+    if not existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="존재하지 않는 사용자입니다."
+        )
+
     #존재하는 달력인지 검사 (404 NOT FOUND)
     existing_calendar = session.query(Calendar).filter(
         Calendar.year == year,
