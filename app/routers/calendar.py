@@ -49,12 +49,23 @@ def get_calendar_handler(user_id: int, year: int, session : Session = Depends(ge
 
 #user_id 에 해당하는 달력 생성
 @router.post(
-    "/calendars",
+    "/users/{user_id}/calendars",
     response_model = CalendarResponse,
     status_code = status.HTTP_201_CREATED,
     summary = "특정 유저의 특정 달력 생성"
 )
 def create_calendar_handler(body: CalendarCreateRequest, user_id: int, session : Session = Depends(get_db)):
+    #존재하는 사용자인지 검사 (404 NOT FOUND)
+    existing_user = session.execute(
+        select(User).where(User.user_id == user_id)
+    ).scalar_one_or_none()
+
+    if not existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="존재하지 않는 사용자입니다."
+        )
+    
     #동일한 연도의 달력이 존재하는지 중복 검사 (409 CONFLICT)
     existing_calendar = session.query(Calendar).filter(
         Calendar.user_id == user_id,
