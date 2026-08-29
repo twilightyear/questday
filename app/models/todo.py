@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import Integer, String, Boolean, ForeignKey, DateTime, func
+from sqlalchemy import Integer, String, Boolean, ForeignKey, DateTime, func, ForeignKeyConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from database.orm import Base
 
@@ -13,6 +13,11 @@ class Todo(Base):
         autoincrement = True
     )
 
+    user_id: Mapped[int] = mapped_column(Integer, nullable=False)
+    year: Mapped[int] = mapped_column(Integer, nullable=False)
+    month: Mapped[int] = mapped_column(Integer, nullable=False)
+    day: Mapped[int] = mapped_column(Integer, nullable=False)
+
     title: Mapped[str] = mapped_column(
         String(255),
         nullable=False
@@ -24,9 +29,12 @@ class Todo(Base):
         default = False
     )
 
-    daily_id: Mapped[int] = mapped_column(
-        ForeignKey('daily.daily_id'),
-        nullable = True
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["user_id", "year","month","day"], 
+            ["daily.user_id", "daily.year", "daily.month", "daily.day"],
+            ondelete="CASCADE"
+        ),
     )
 
     daily: Mapped["Daily"] = relationship(
