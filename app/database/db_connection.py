@@ -18,3 +18,10 @@ SessionFactory = sessionmaker(
     expire_on_commit = False, #커밋 이후 값 자동 삭제 비활성화
     bind = engine #데이터베이스 통로와 링크
 )
+
+def get_db():
+    session = SessionFactory()
+    try:
+        yield session
+    finally:
+        session.close()
