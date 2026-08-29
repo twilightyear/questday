@@ -15,7 +15,7 @@ router = APIRouter(tags=["Daily"])
     "/users/{user_id}/calendars/{year}/dailies",
     response_model = list[DailyResponse],
     status_code = status.HTTP_200_OK,
-    summary = "특정 유저의 특정 달력에 대한 전체 날짜 조회"
+    summary = "전체 날짜에 대한 조회"
 )
 def get_dailies_handler(user_id: int, year: int, session : Session = Depends(get_db)):
     #존재하는 사용자인지 검사 (404 NOT FOUND)
@@ -41,7 +41,6 @@ def get_dailies_handler(user_id: int, year: int, session : Session = Depends(get
             detail="존재하는 달력이 없습니다."
         )
 
-    #존재하는 날짜인지 검사 (404 NOT FOUND)
     existing_dailies = session.query(Daily).filter(
         Daily.user_id == user_id,
         Daily.year == year
@@ -50,12 +49,60 @@ def get_dailies_handler(user_id: int, year: int, session : Session = Depends(get
     return existing_dailies
 
 
+#Daily 단일 조회
+@router.get(
+    "/users/{user_id}/calendars/{year}/dailies/{month}/{day}",
+    response_model = DailyResponse,
+    status_code = status.HTTP_200_OK,
+    summary = "특정 날짜에 대한 조회"
+)
+def get_daily_handler(user_id: int, year: int, month: int, day: int, session : Session = Depends(get_db)):
+    #존재하는 사용자인지 검사 (404 NOT FOUND)
+    existing_user = session.execute(
+        select(User).where(User.user_id == user_id)
+    ).scalar_one_or_none()
+
+    if not existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="존재하는 사용자가 없습니다."
+        )
+    
+    #존재하는 달력인지 검사 (404 NOT FOUND)
+    existing_calendar = session.query(Calendar).filter(
+        Calendar.user_id == user_id,
+        Calendar.year == year
+    ).first()
+
+    if not existing_calendar:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="존재하는 달력이 없습니다."
+        )
+
+    #존재하는 날짜인지 검사 (404 NOT FOUND)
+    existing_daily = session.query(Daily).filter(
+        Daily.user_id == user_id,
+        Daily.year == year,
+        Daily.month == month,
+        Daily.day == day
+    ).first()
+
+    if not existing_daily:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="존재하는 날짜가 없습니다."
+        )
+
+    return existing_daily
+
+
 #Daily 단일 생성
 @router.post(
     "/users/{user_id}/calendars/{year}/dailies",
     response_model = DailyResponse,
     status_code = status.HTTP_201_CREATED,
-    summary = "특정 유저의 특정 달력 생성"
+    summary = "특정 날짜 생성"
 )
 def create_daily_handler(body: DailyCreateRequest, user_id: int, year: int, session : Session = Depends(get_db)):
     #존재하는 사용자인지 검사 (404 NOT FOUND)
