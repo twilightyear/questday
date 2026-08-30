@@ -8,7 +8,7 @@ from routers.category import router as category_router
 from routers.todo import router as todo_router
 
 #데이터베이스 연결 및 동기화
-Base.metadata.drop_all(bind=engine)
+#Base.metadata.drop_all(bind=engine)
 Base.metadata.create_all(bind = engine)
 
 #서버 객체 생성
@@ -19,3 +19,4 @@ app.include_router(user_router)
 app.include_router(calendar_router)
 app.include_router(daily_router)
 app.include_router(category_router)
+app.include_router(todo_router)
