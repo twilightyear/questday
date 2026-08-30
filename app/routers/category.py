@@ -32,10 +32,12 @@ def get_categories_handler(user_id: int, year: int, month: int, day: int, sessio
         )
     
     #존재하는 달력인지 검사 (404 NOT FOUND)
-    existing_calendar = session.query(Calendar).filter(
-        Calendar.user_id == user_id,
-        Calendar.year == year
-    ).first()
+    existing_calendar = session.execute(
+        select(Calendar).where(
+            Calendar.user_id == user_id,
+            Calendar.year == year
+        )
+    ).scalar_one_or_none()
 
     if not existing_calendar:
         raise HTTPException(
@@ -44,11 +46,13 @@ def get_categories_handler(user_id: int, year: int, month: int, day: int, sessio
         )
 
     #존재하는 날짜인지 검사 (404 NOT FOUND)
-    existing_daily = session.query(Daily).filter(
-        Daily.calendar_id == existing_calendar.calendar_id,
-        Daily.month == month,
-        Daily.day == day
-    ).first()
+    existing_daily = session.execute(
+        select(Daily).where(
+            Daily.calendar_id == existing_calendar.calendar_id,
+            Daily.month == month,
+            Daily.day == day
+        )
+    ).scalar_one_or_none()
 
     if not existing_daily:
         raise HTTPException(
@@ -56,9 +60,11 @@ def get_categories_handler(user_id: int, year: int, month: int, day: int, sessio
             detail="존재하는 날짜가 없습니다."
         )
     
-    existing_categories = session.query(Category).filter(
-        Category.daily_id == existing_daily.daily_id
-    ).all()
+    existing_categories = session.execute(
+        select(Category).where(
+            Category.daily_id == existing_daily.daily_id
+        )
+    ).scalars().all()
 
     return existing_categories
 
@@ -82,10 +88,12 @@ def get_category_handler(user_id: int, year: int, month: int, day: int, category
         )
     
     #존재하는 달력인지 검사 (404 NOT FOUND)
-    existing_calendar = session.query(Calendar).filter(
-        Calendar.user_id == user_id,
-        Calendar.year == year
-    ).first()
+    existing_calendar = session.execute(
+        select(Calendar).where(
+            Calendar.user_id == user_id,
+            Calendar.year == year
+        )
+    ).scalar_one_or_none()
 
     if not existing_calendar:
         raise HTTPException(
@@ -94,11 +102,13 @@ def get_category_handler(user_id: int, year: int, month: int, day: int, category
         )
 
     #존재하는 날짜인지 검사 (404 NOT FOUND)
-    existing_daily = session.query(Daily).filter(
-        Daily.calendar_id == existing_calendar.calendar_id,
-        Daily.month == month,
-        Daily.day == day
-    ).first()
+    existing_daily = session.execute(
+        select(Daily).where(
+            Daily.calendar_id == existing_calendar.calendar_id,
+            Daily.month == month,
+            Daily.day == day
+        )
+    ).scalar_one_or_none()
 
     if not existing_daily:
         raise HTTPException(
@@ -106,10 +116,13 @@ def get_category_handler(user_id: int, year: int, month: int, day: int, category
             detail="존재하는 날짜가 없습니다."
         )
     
-    existing_category = session.query(Category).filter(
-        Category.daily_id == existing_daily.daily_id,
-        Category.category_id == category_id
-    ).first()
+    #존재하는 카테고리인지 검사 (404 NOT FOUND)
+    existing_category = session.execute(
+        select(Category).where(
+            Category.daily_id == existing_daily.daily_id,
+            Category.category_id == category_id
+        )
+    ).scalar_one_or_none()
 
     if not existing_category:
         raise HTTPException(
@@ -139,10 +152,12 @@ def create_category_handler(body: CategoryCreateRequest, user_id: int, year: int
         )
     
     #존재하는 달력인지 검사 (404 NOT FOUND)
-    existing_calendar = session.query(Calendar).filter(
-        Calendar.year == year,
-        Calendar.user_id == user_id
-    ).first()
+    existing_calendar = session.execute(
+        select(Calendar).where(
+            Calendar.user_id == user_id,
+            Calendar.year == year
+        )
+    ).scalar_one_or_none()
 
     if not existing_calendar:
         raise HTTPException(
@@ -151,12 +166,14 @@ def create_category_handler(body: CategoryCreateRequest, user_id: int, year: int
         )
 
     #존재하는 날짜인지 검사 (404 NOT FOUND)
-    existing_daily = session.query(Daily).filter(
-        Daily.calendar_id == existing_calendar.calendar_id,
-        Daily.month == month,
-        Daily.day == day
-    ).first()
-
+    existing_daily = session.execute(
+        select(Daily).where(
+            Daily.calendar_id == existing_calendar.calendar_id,
+            Daily.month == month,
+            Daily.day == day
+        )
+    ).scalar_one_or_none()
+    
     if not existing_daily:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -164,10 +181,12 @@ def create_category_handler(body: CategoryCreateRequest, user_id: int, year: int
         )
 
     #동일한 카테고리가 존재하는지 중복 검사 (409 CONFLICT)
-    existing_category = session.query(Category).filter(
-        Category.daily_id == existing_daily.daily_id,
-        Category.title == body.title
-    ).first()
+    existing_category = session.execute(
+        select(Category).where(
+            Category.daily_id == existing_daily.daily_id,
+            Category.title == body.title
+        )
+    ).scalar_one_or_none()
 
     if existing_category:
         raise HTTPException(
