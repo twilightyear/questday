@@ -2,9 +2,10 @@ from pydantic import BaseModel
 
 
 class TodoResponse(BaseModel):
-    id: int
+    todo_id: int
     category: str
-    job: str
+    title: str
+    content: str
     is_done: bool
 
     class Config:

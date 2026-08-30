@@ -13,7 +13,17 @@ class Todo(Base):
         ForeignKey("daily.daily_id", ondelete="CASCADE")
     )
 
+    category: Mapped[str] = mapped_column(
+        String(255),
+        nullable=False
+    )
+
     title: Mapped[str] = mapped_column(
+        String(255),
+        nullable=False
+    )
+
+    content: Mapped[str] = mapped_column(
         String(255),
         nullable=False
     )

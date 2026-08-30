@@ -1,111 +1,71 @@
-from fastapi import HTTPException, APIRouter
+from fastapi import HTTPException, APIRouter, Depends
 from sqlalchemy import select
 from starlette import status
-from database.db_connection import SessionFactory
+from database.db_connection import SessionFactory, get_db
 from models.todo import Todo
+from models.user import User
+from models.daily import Daily
+from models.calendar import Calendar
 from schema.todo.todo_request import TodoCreateRequest, TodoUpdateRequest
 from schema.todo.todo_response import TodoResponse
+from sqlalchemy.orm import Session
 
 router = APIRouter(tags = ["Todo"]) #Todo 라우터
 
-"""
-#전체 할일 조회
+#전체 Todo 조회
 @router.get(
-    "/todos",
+    "/users/{user_id}/calendars/{year}/dailies/{month}/{day}/todo",
     response_model = list[TodoResponse],
-    status_code = status.HTTP_200_OK
+    status_code = status.HTTP_200_OK,
+    summary = "전체 Todo 조회"
 )
-def get_todos_handler():
-    session = SessionFactory()
-    try:
-        stmt = select(Todo)
-        todos = session.execute(stmt).scalars().all()
-        return todos
-    finally:
-        session.close()
+def get_todos_handler(user_id: int, year: int, month: int, day: int, session : Session = Depends(get_db)):
+    #존재하는 사용자인지 검사 (404 NOT FOUND)
+    existing_user = session.execute(
+        select(User).where(User.user_id == user_id)
+    ).scalar_one_or_none()
 
-#단일 할일 조회
-@router.get(
-    "/todos/{todo_id}",
-    response_model = TodoResponse,
-    status_code = status.HTTP_200_OK
-)
-def get_todo_handler(todo_id: int):
-    session = SessionFactory()
-    try:
-        stmt = select(Todo).where(Todo.id == todo_id)
-        todo = session.execute(stmt).scalars().first()
-        if todo:
-            return todo
+    if not existing_user:
         raise HTTPException(
-            status_code = status.HTTP_404_NOT_FOUND,
-            detail = "Todo not found"
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="존재하는 사용자가 없습니다."
         )
-    finally:
-        session.close()
+    
+    #존재하는 달력인지 검사 (404 NOT FOUND)
+    existing_calendar = session.query(Calendar).filter(
+        Calendar.user_id == user_id,
+        Calendar.year == year
+    ).first()
 
-#단일 할일 생성
-@router.post(
-    "/todos",
-    response_model = TodoResponse,
-    status_code = status.HTTP_201_CREATED
-)
-def create_todo_handler(body: TodoCreateRequest):
-    session = SessionFactory()
-    try:
-        todo = Todo(
-            title = body.title,
-            is_done = body.is_done,
-        )
-        session.add(todo)
-        session.commit()
-        return todo
-    finally:
-        session.close()
-
-#단일 할일 수정
-@router.patch(
-    "/todos/{todo_id}",
-    response_model = TodoResponse,
-    status_code = status.HTTP_200_OK
-)
-def update_todo_handler(todo_id: int, body: TodoUpdateRequest):
-    session = SessionFactory()
-    try: #If it exists
-        stmt = select(Todo).where(Todo.id == todo_id)
-        todo = session.execute(stmt).scalars().first()
-        if todo:
-            if body.title is not None:
-                todo.title = body.title
-            if body.is_done is not None:
-                todo.is_done = body.is_done
-            session.commit() #Commit
-            return todo
+    if not existing_calendar:
         raise HTTPException(
-            status_code = status.HTTP_404_NOT_FOUND,
-            detail = "Todo not found"
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="존재하는 달력이 없습니다."
         )
-    finally:
-        session.close()
 
-#단일 할일 삭제
-@router.delete(
-    "/todos/{todo_id}",
-    status_code = status.HTTP_204_NO_CONTENT
-)
-def delete_todo_handler(todo_id: int):
-    session = SessionFactory()
-    try: #If it exists
-        stmt = select(Todo).where(Todo.id == todo_id)
-        todo = session.execute(stmt).scalars().first()
-        if todo:
-            session.delete(todo)
-            session.commit()
-            return
+    #존재하는 날짜인지 검사 (404 NOT FOUND)
+    existing_daily = session.query(Daily).filter(
+        Daily.calendar_id == existing_calendar.calendar_id,
+        Daily.month == month,
+        Daily.day == day
+    ).first()
+
+    if not existing_daily:
         raise HTTPException(
-            status_code = status.HTTP_404_NOT_FOUND,
-            detail = "Todo no found"
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="존재하는 날짜가 없습니다."
         )
-    finally:
-        session.close()]
-"""
+    
+    existing_todos = session.query(Todo).filter(
+        Todo.daily_id == existing_daily.daily_id
+    ).all()
+
+    return existing_todos
+
+#단일 Todo 생성
+
+#단일 Todo 삭제
+
+#전체 Todo 삭제
+
+#단일 Todo 수정
