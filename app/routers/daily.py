@@ -154,6 +154,54 @@ def create_daily_handler(body: DailyCreateRequest, user_id: int, year: int, sess
     return daily
 
 #단일 Daily 삭제
+@router.delete(
+    "/users/{user_id}/calendars/{year}/dailies/{month}/{day}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary = "단일 Daily 삭제"
+)
+def delete_daily_handler(user_id: int, year: int, month: int, day: int, session : Session = Depends(get_db)):
+
+    #존재하는 사용자인지 검사 (404 NOT FOUND)
+    existing_user = session.execute(
+        select(User).where(User.user_id == user_id)
+    ).scalar_one_or_none()
+
+    if not existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="존재하지 않는 사용자입니다."
+        )
+
+    #존재하는 달력인지 검사 (404 NOT FOUND)
+    existing_calendar = session.query(Calendar).filter(
+        Calendar.year == year,
+        Calendar.user_id == user_id
+    ).first()
+
+    if not existing_calendar:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="존재하지 않는 달력입니다."
+        )
+
+    #존재하는 날짜인지 검사 (404 NOT FOUND)
+    existing_daily = session.query(Daily).filter(
+        Daily.user_id == user_id,
+        Daily.year == year,
+        Daily.month == month,
+        Daily.day == day
+    ).first()
+
+    if not existing_daily:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="존재하는 날짜가 없습니다."
+        )
+
+    session.delete(existing_daily)
+    session.commit()
+
+    return None
 
 #전체 Daily 삭제
 
