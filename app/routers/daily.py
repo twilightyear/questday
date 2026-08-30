@@ -5,7 +5,7 @@ from models.daily import Daily
 from models.user import User
 from models.calendar import Calendar
 from sqlalchemy.orm import Session
-from schema.daily.daily_request import DailyCreateRequest
+from schema.daily.daily_request import DailyCreateRequest, DailyUpdateRequest
 from schema.daily.daily_response import DailyResponse
 
 router = APIRouter(tags=["Daily"])
@@ -204,5 +204,111 @@ def delete_daily_handler(user_id: int, year: int, month: int, day: int, session 
     return None
 
 #전체 Daily 삭제
+@router.delete(
+    "/users/{user_id}/calendars/{year}/dailies",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary = "전체 Daily 삭제"
+)
+def delete_daily_handler(user_id: int, year: int, session : Session = Depends(get_db)):
+    #존재하는 사용자인지 검사 (404 NOT FOUND)
+    existing_user = session.execute(
+        select(User).where(User.user_id == user_id)
+    ).scalar_one_or_none()
+
+    if not existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="존재하지 않는 사용자입니다."
+        )
+
+    #존재하는 달력인지 검사 (404 NOT FOUND)
+    existing_calendar = session.query(Calendar).filter(
+        Calendar.year == year,
+        Calendar.user_id == user_id
+    ).first()
+
+    if not existing_calendar:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="존재하지 않는 달력입니다."
+        )
+
+    #존재하는 날짜인지 검사 (404 NOT FOUND)
+    existing_dailies = session.query(Daily).filter(
+        Daily.user_id == user_id,
+        Daily.year == year
+    ).all()
+
+    for existing_daily in existing_dailies:
+        session.delete(existing_daily)
+
+    session.commit()
+
+    return None
 
 #단일 Daily 수정
+@router.patch(
+    "/users/{user_id}/calendars/{year}/dailies/{month}/{day}",
+    response_model = DailyResponse,
+    status_code = status.HTTP_200_OK,
+    summary = "단일 Daily 생성"
+)
+def create_daily_handler(body: DailyUpdateRequest, user_id: int, year: int, month: int, day: int, session : Session = Depends(get_db)):
+    #존재하는 사용자인지 검사 (404 NOT FOUND)
+    existing_user = session.execute(
+        select(User).where(User.user_id == user_id)
+    ).scalar_one_or_none()
+
+    if not existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="존재하지 않는 사용자입니다."
+        )
+    
+    #존재하는 달력인지 검사 (404 NOT FOUND)
+    existing_calendar = session.query(Calendar).filter(
+        Calendar.year == year,
+        Calendar.user_id == user_id
+    ).first()
+
+    if not existing_calendar:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="존재하지 않는 달력입니다."
+        )
+
+    #존재하는 날짜인지 검사 (404 NOT FOUND)
+    existing_daily = session.query(Daily).filter(
+        Daily.user_id == user_id,
+        Daily.year == year,
+        Daily.month == month,
+        Daily.day == day
+    ).first()
+
+    if not existing_daily:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="존재하지 않는 날짜입니다."
+        )
+
+    #바꿀 날짜가 이미 존재하는 날짜인지 검사 (409 CONFLICT)
+    duplicate_daily = session.query(Daily).filter(
+        Daily.user_id == user_id,
+        Daily.year == year,
+        Daily.month == body.month,
+        Daily.day == body.day
+    ).first()
+
+    if duplicate_daily:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="이미 존재하는 날짜입니다."
+        )
+
+    existing_daily.month = body.month
+    existing_daily.day = body.day
+
+    session.commit()
+    session.refresh(existing_daily)
+
+    return existing_daily
