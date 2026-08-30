@@ -9,8 +9,8 @@ class Todo(Base):
 
     todo_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
 
-    daily_id: Mapped[int] = mapped_column(
-        ForeignKey("daily.daily_id", ondelete="CASCADE")
+    category_id: Mapped[int] = mapped_column(
+        ForeignKey("category.category_id", ondelete="CASCADE")
     )
 
     category: Mapped[str] = mapped_column(
@@ -33,6 +33,6 @@ class Todo(Base):
         nullable = False,
     )
 
-    daily: Mapped["Daily"] = relationship(
+    category: Mapped["Category"] = relationship(
         back_populates = "todos" #사용자 테이블과 관계 설정 (객체 연결)
     )
