@@ -1,19 +1,24 @@
 from datetime import datetime
-from sqlalchemy import Integer, String, Boolean, ForeignKey, DateTime, func
+from sqlalchemy import Integer, String, Boolean, ForeignKey, DateTime, func, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from database.orm import Base
 
 class Calendar(Base):
     __tablename__ = "calendar"
 
-    user_id: Mapped[int] = mapped_column(
-        ForeignKey("user.user_id"),
-        primary_key=True
+    calendar_id: Mapped[int] = mapped_column(
+        primary_key = True,
+        autoincrement = True
     )
 
-    year: Mapped[int] = mapped_column(
-        Integer,
-        primary_key=True
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("user.user_id", ondelete = "CASCADE")
+    )
+
+    year: Mapped[int] = mapped_column()
+
+    __table_args__ = (
+        UniqueConstraint("user_id", "year", name="uq_user_calendar_year"),
     )
 
     #가상속성 : user
