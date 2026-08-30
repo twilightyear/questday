@@ -2,10 +2,11 @@ from fastapi import HTTPException, APIRouter, Depends
 from sqlalchemy import select
 from starlette import status
 from database.db_connection import SessionFactory, get_db
-from models.todo import Todo
 from models.user import User
-from models.daily import Daily
 from models.calendar import Calendar
+from models.daily import Daily
+from models.category import Category
+from models.todo import Todo
 from schema.todo.todo_request import TodoCreateRequest, TodoUpdateRequest
 from schema.todo.todo_response import TodoResponse
 from sqlalchemy.orm import Session

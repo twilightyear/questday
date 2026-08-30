@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, Field, field_validator, ValidationError
+from pydantic import BaseModel
 
 
 class TodoCreateRequest(BaseModel): #할일 생성시의 데이터 규칙

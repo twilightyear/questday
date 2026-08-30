@@ -1,11 +1,11 @@
 from pydantic import BaseModel
-from schema.todo.todo_response import TodoResponse
+from schema.category.category_response import CategoryResponse
 
 
 class DailyResponse(BaseModel):
     month: int
     day: int
-    todos: list[TodoResponse] = []
+    categories: list[CategoryResponse] = []
 
     class Config:
         from_attributes = True

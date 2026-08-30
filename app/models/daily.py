@@ -3,6 +3,7 @@ from sqlalchemy import Integer, String, Boolean, ForeignKey, DateTime, func, Uni
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from database.orm import Base
 
+
 class Daily(Base):
     __tablename__ = "daily"
 
@@ -27,7 +28,7 @@ class Daily(Base):
         back_populates="dailies"
     )
 
-    todos: Mapped[list["Todo"]] = relationship(
+    categories: Mapped[list["Category"]] = relationship(
         back_populates="daily",
         cascade = "all, delete-orphan"
     )
