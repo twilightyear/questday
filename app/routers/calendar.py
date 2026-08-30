@@ -10,13 +10,12 @@ from sqlalchemy.orm import Session
 
 router = APIRouter(tags=["Calendar"])
 
-
-#user_id 에 해당하는 달력 전부 가져오기
+#전체 Calendar 조회
 @router.get(
     "/users/{user_id}/calendars",
     response_model = list[CalendarResponse],
     status_code = status.HTTP_200_OK,
-    summary = "특정 유저의 전체 달력 조회"
+    summary = "전체 Calendar 조회"
 )
 def get_calendars_handler(user_id: int, session : Session = Depends(get_db)):
     #존재하는 사용자인지 검사 (404 NOT FOUND)
@@ -43,14 +42,12 @@ def get_calendars_handler(user_id: int, session : Session = Depends(get_db)):
 
     return existing_calendars
 
-
-
-#user_id 에 해당하는 달력중에서 특정 달력만 가져오기
+#단일 Calendar 조회
 @router.get(
     "/users/{user_id}/calendars/{year}",
     response_model = CalendarResponse,
     status_code = status.HTTP_200_OK,
-    summary = "특정 유저의 특정 달력 조회"
+    summary = "단일 Calendar 조회"
 )
 def get_calendar_handler(user_id: int, year: int, session : Session = Depends(get_db)):
     #존재하는 사용자인지 검사 (404 NOT FOUND)
@@ -78,13 +75,12 @@ def get_calendar_handler(user_id: int, year: int, session : Session = Depends(ge
 
     return existing_calendar
 
-
-#user_id 에 해당하는 달력 생성
+#단일 Calendar 생성
 @router.post(
     "/users/{user_id}/calendars",
     response_model = CalendarResponse,
     status_code = status.HTTP_201_CREATED,
-    summary = "특정 유저의 특정 달력 생성"
+    summary = "단일 Calendar 생성"
 )
 def create_calendar_handler(body: CalendarCreateRequest, user_id: int, session : Session = Depends(get_db)):
     #존재하는 사용자인지 검사 (404 NOT FOUND)
@@ -121,12 +117,11 @@ def create_calendar_handler(body: CalendarCreateRequest, user_id: int, session :
 
     return calendar
 
-
-#user_id 에 해당하는 달력 삭제
+#단일 Calendar 삭제
 @router.delete(
     "/users/{user_id}/calendars/{year}",
     status_code=status.HTTP_204_NO_CONTENT,
-    summary = "특정 유저의 특정 달력 삭제"
+    summary = "단일 Calendar 삭제"
 )
 def delete_calendar_handler(year: int, user_id: int, session : Session = Depends(get_db)):
 
@@ -158,12 +153,11 @@ def delete_calendar_handler(year: int, user_id: int, session : Session = Depends
 
     return None
 
-
-#user_id 에 해당하는 달력 전부 삭제
+#전체 Calendar 삭제
 @router.delete(
     "/users/{user_id}/calendars",
     status_code=status.HTTP_204_NO_CONTENT,
-    summary = "특정 유저의 모든 달력 삭제"
+    summary = "전체 Calendar 삭제"
 )
 def delete_calendars_handler(user_id: int, session : Session = Depends(get_db)):
     #존재하는 사용자인지 검사 (404 NOT FOUND)

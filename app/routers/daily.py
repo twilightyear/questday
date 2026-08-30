@@ -10,12 +10,12 @@ from schema.daily.daily_response import DailyResponse
 
 router = APIRouter(tags=["Daily"])
 
-#Daily 사용자&연도별 전체 조회
+#전체 Daily 조회
 @router.get(
     "/users/{user_id}/calendars/{year}/dailies",
     response_model = list[DailyResponse],
     status_code = status.HTTP_200_OK,
-    summary = "전체 날짜에 대한 조회"
+    summary = "전체 Daily 조회"
 )
 def get_dailies_handler(user_id: int, year: int, session : Session = Depends(get_db)):
     #존재하는 사용자인지 검사 (404 NOT FOUND)
@@ -48,13 +48,12 @@ def get_dailies_handler(user_id: int, year: int, session : Session = Depends(get
 
     return existing_dailies
 
-
-#Daily 단일 조회
+#단일 Daily 조회
 @router.get(
     "/users/{user_id}/calendars/{year}/dailies/{month}/{day}",
     response_model = DailyResponse,
     status_code = status.HTTP_200_OK,
-    summary = "특정 날짜에 대한 조회"
+    summary = "단일 Daily 조회"
 )
 def get_daily_handler(user_id: int, year: int, month: int, day: int, session : Session = Depends(get_db)):
     #존재하는 사용자인지 검사 (404 NOT FOUND)
@@ -96,13 +95,12 @@ def get_daily_handler(user_id: int, year: int, month: int, day: int, session : S
 
     return existing_daily
 
-
-#Daily 단일 생성
+#단일 Daily 생성
 @router.post(
     "/users/{user_id}/calendars/{year}/dailies",
     response_model = DailyResponse,
     status_code = status.HTTP_201_CREATED,
-    summary = "특정 날짜 생성"
+    summary = "단일 Daily 생성"
 )
 def create_daily_handler(body: DailyCreateRequest, user_id: int, year: int, session : Session = Depends(get_db)):
     #존재하는 사용자인지 검사 (404 NOT FOUND)
@@ -154,3 +152,9 @@ def create_daily_handler(body: DailyCreateRequest, user_id: int, year: int, sess
     session.refresh(daily)
 
     return daily
+
+#단일 Daily 삭제
+
+#전체 Daily 삭제
+
+#단일 Daily 수정
