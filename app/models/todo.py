@@ -13,11 +13,6 @@ class Todo(Base):
         ForeignKey("category.category_id", ondelete="CASCADE")
     )
 
-    category: Mapped[str] = mapped_column(
-        String(255),
-        nullable=False
-    )
-
     title: Mapped[str] = mapped_column(
         String(255),
         nullable=False
