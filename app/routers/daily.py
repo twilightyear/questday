@@ -42,8 +42,7 @@ def get_dailies_handler(user_id: int, year: int, session : Session = Depends(get
         )
 
     existing_dailies = session.query(Daily).filter(
-        Daily.user_id == user_id,
-        Daily.year == year
+        Daily.calendar_id == existing_calendar.calendar_id
     ).all()
 
     return existing_dailies
@@ -81,8 +80,7 @@ def get_daily_handler(user_id: int, year: int, month: int, day: int, session : S
 
     #존재하는 날짜인지 검사 (404 NOT FOUND)
     existing_daily = session.query(Daily).filter(
-        Daily.user_id == user_id,
-        Daily.year == year,
+        Daily.calendar_id == existing_calendar.calendar_id,
         Daily.month == month,
         Daily.day == day
     ).first()
@@ -128,8 +126,7 @@ def create_daily_handler(body: DailyCreateRequest, user_id: int, year: int, sess
 
     #동일한 날짜가 존재하는지 중복 검사 (409 CONFLICT)
     existing_daily = session.query(Daily).filter(
-        Daily.user_id == user_id,
-        Daily.year == year,
+        Daily.calendar_id == existing_calendar.calendar_id,
         Daily.month == body.month,
         Daily.day == body.day
     ).first()
@@ -141,8 +138,7 @@ def create_daily_handler(body: DailyCreateRequest, user_id: int, year: int, sess
         )
 
     daily = Daily(
-        user_id = user_id,
-        year = year,
+        calendar_id = existing_calendar.calendar_id,
         month = body.month,
         day = body.day
     )
@@ -186,8 +182,7 @@ def delete_daily_handler(user_id: int, year: int, month: int, day: int, session 
 
     #존재하는 날짜인지 검사 (404 NOT FOUND)
     existing_daily = session.query(Daily).filter(
-        Daily.user_id == user_id,
-        Daily.year == year,
+        Daily.calendar_id == existing_calendar.calendar_id,
         Daily.month == month,
         Daily.day == day
     ).first()
@@ -235,8 +230,7 @@ def delete_daily_handler(user_id: int, year: int, session : Session = Depends(ge
 
     #존재하는 날짜인지 검사 (404 NOT FOUND)
     existing_dailies = session.query(Daily).filter(
-        Daily.user_id == user_id,
-        Daily.year == year
+        Daily.calendar_id == existing_calendar.calendar_id
     ).all()
 
     for existing_daily in existing_dailies:
@@ -253,7 +247,7 @@ def delete_daily_handler(user_id: int, year: int, session : Session = Depends(ge
     status_code = status.HTTP_200_OK,
     summary = "단일 Daily 생성"
 )
-def create_daily_handler(body: DailyUpdateRequest, user_id: int, year: int, month: int, day: int, session : Session = Depends(get_db)):
+def update_daily_handler(body: DailyUpdateRequest, user_id: int, year: int, month: int, day: int, session : Session = Depends(get_db)):
     #존재하는 사용자인지 검사 (404 NOT FOUND)
     existing_user = session.execute(
         select(User).where(User.user_id == user_id)
@@ -279,8 +273,7 @@ def create_daily_handler(body: DailyUpdateRequest, user_id: int, year: int, mont
 
     #존재하는 날짜인지 검사 (404 NOT FOUND)
     existing_daily = session.query(Daily).filter(
-        Daily.user_id == user_id,
-        Daily.year == year,
+        Daily.calendar_id == existing_calendar.calendar_id,
         Daily.month == month,
         Daily.day == day
     ).first()
@@ -293,8 +286,7 @@ def create_daily_handler(body: DailyUpdateRequest, user_id: int, year: int, mont
 
     #바꿀 날짜가 이미 존재하는 날짜인지 검사 (409 CONFLICT)
     duplicate_daily = session.query(Daily).filter(
-        Daily.user_id == user_id,
-        Daily.year == year,
+        Daily.calendar_id == existing_calendar.calendar_id,
         Daily.month == body.month,
         Daily.day == body.day
     ).first()

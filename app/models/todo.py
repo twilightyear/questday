@@ -7,16 +7,11 @@ from database.orm import Base
 class Todo(Base):
     __tablename__ = 'todo'
 
-    id: Mapped[int] = mapped_column(
-        Integer,
-        primary_key = True,
-        autoincrement = True
-    )
+    todo_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
 
-    user_id: Mapped[int] = mapped_column(Integer, nullable=False)
-    year: Mapped[int] = mapped_column(Integer, nullable=False)
-    month: Mapped[int] = mapped_column(Integer, nullable=False)
-    day: Mapped[int] = mapped_column(Integer, nullable=False)
+    daily_id: Mapped[int] = mapped_column(
+        ForeignKey("daily.daily_id", ondelete="CASCADE")
+    )
 
     title: Mapped[str] = mapped_column(
         String(255),
@@ -26,15 +21,6 @@ class Todo(Base):
     is_done: Mapped[bool] = mapped_column(
         Boolean,
         nullable = False,
-        default = False
-    )
-
-    __table_args__ = (
-        ForeignKeyConstraint(
-            ["user_id", "year","month","day"], 
-            ["daily.user_id", "daily.year", "daily.month", "daily.day"],
-            ondelete="CASCADE"
-        ),
     )
 
     daily: Mapped["Daily"] = relationship(

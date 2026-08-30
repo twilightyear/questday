@@ -1,22 +1,26 @@
 from datetime import datetime
-from sqlalchemy import Integer, String, Boolean, ForeignKey, DateTime, func, ForeignKeyConstraint
+from sqlalchemy import Integer, String, Boolean, ForeignKey, DateTime, func, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from database.orm import Base
 
 class Daily(Base):
     __tablename__ = "daily"
 
-    user_id: Mapped[int] = mapped_column(primary_key = True)
-    year: Mapped[int] = mapped_column(primary_key = True)
-    month: Mapped[int] = mapped_column(primary_key = True)
-    day: Mapped[int] = mapped_column(primary_key = True)
+    daily_id: Mapped[int] = mapped_column(
+        primary_key = True,
+        autoincrement=True
+    )
+
+    calendar_id: Mapped[int] = mapped_column(
+        ForeignKey("calendar.calendar_id", ondelete="CASCADE")
+    )
+
+    month: Mapped[int] = mapped_column()
+
+    day: Mapped[int] = mapped_column()
 
     __table_args__ = (
-        ForeignKeyConstraint(
-            ["user_id", "year"], 
-            ["calendar.user_id", "calendar.year"],
-            ondelete="CASCADE"
-        ),
+        UniqueConstraint("calendar_id", "month", "day", name="uq_calendar_daily_date"),
     )
 
     calendar: Mapped["Calendar"] = relationship(

@@ -7,7 +7,7 @@ from routers.daily import router as daily_router
 from routers.todo import router as todos_router
 
 #데이터베이스 연결 및 동기화
-#Base.metadata.drop_all(bind=engine)
+Base.metadata.drop_all(bind=engine)
 Base.metadata.create_all(bind = engine)
 
 #서버 객체 생성
