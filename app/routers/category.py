@@ -212,8 +212,7 @@ def create_category_handler(body: CategoryCreateRequest, user_id: int, year: int
     status_code=status.HTTP_204_NO_CONTENT,
     summary = "단일 Category 삭제"
 )
-def delete_daily_handler(user_id: int, year: int, month: int, day: int, category_id: int, session : Session = Depends(get_db)):
-
+def delete_category_handler(user_id: int, year: int, month: int, day: int, category_id: int, session : Session = Depends(get_db)):
     #존재하는 사용자인지 검사 (404 NOT FOUND)
     existing_user = session.execute(
         select(User).where(User.user_id == user_id)
@@ -273,5 +272,70 @@ def delete_daily_handler(user_id: int, year: int, month: int, day: int, category
     return None
 
 #전체 Category 삭제
+@router.delete(
+    "/users/{user_id}/calendars/{year}/dailies/{month}/{day}/category",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary = "전체 Category 삭제"
+)
+def delete_categories_handler(user_id: int, year: int, month: int, day: int, session : Session = Depends(get_db)):
+    #존재하는 사용자인지 검사 (404 NOT FOUND)
+    existing_user = session.execute(
+        select(User).where(User.user_id == user_id)
+    ).scalar_one_or_none()
+
+    if not existing_user:
+        raise HTTPException(
+            status_code = status.HTTP_404_NOT_FOUND,
+            detail = "존재하지 않는 사용자입니다."
+        )
+
+    #존재하는 달력인지 검사 (404 NOT FOUND)
+    existing_calendar = session.execute(
+        select(Calendar).where(
+            Calendar.year == year,
+            Calendar.user_id == user_id
+        )
+    ).scalar_one_or_none()
+
+    if not existing_calendar:
+        raise HTTPException(
+            status_code = status.HTTP_404_NOT_FOUND,
+            detail = "존재하지 않는 달력입니다."
+        )
+
+    #존재하는 날짜인지 검사 (404 NOT FOUND)
+    existing_daily = session.execute(
+        select(Daily).where(
+            Daily.calendar_id == existing_calendar.calendar_id,
+            Daily.month == month,
+            Daily.day == day
+        )
+    ).scalar_one_or_none()
+
+    if not existing_daily:
+        raise HTTPException(
+            status_code = status.HTTP_404_NOT_FOUND,
+            detail = "존재하지 않는 날짜입니다."
+        )
+    
+    #존재하는 카테고리인지 검사 (404 NOT FOUND)
+    existing_categories = session.execute(
+        select(Category).where(
+            Category.daily_id == existing_daily.daily_id
+        )
+    ).scalars().all()
+
+    if not existing_categories:
+        raise HTTPException(
+            status_code = status.HTTP_404_NOT_FOUND,
+            detail = "존재하는 카테고리가 없습니다."
+        )
+
+    for category in existing_categories:
+        session.delete(category)
+
+    session.commit()
+
+    return None
 
 #단일 Category 수정

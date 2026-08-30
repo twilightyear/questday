@@ -7,7 +7,9 @@ from database.orm import Base
 class Category(Base):
     __tablename__ = 'category'
 
-    category_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    category_id: Mapped[int] = mapped_column(
+        primary_key=True, autoincrement=True
+    )
 
     daily_id: Mapped[int] = mapped_column(
         ForeignKey("daily.daily_id", ondelete="CASCADE")
