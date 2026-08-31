@@ -28,12 +28,14 @@ def get_dailies_handler(user_id: int, year: int, session : Session = Depends(get
             status_code=status.HTTP_404_NOT_FOUND,
             detail="존재하지 않는 사용자입니다."
         )
-    
+
     #존재하는 달력인지 검사 (404 NOT FOUND)
-    existing_calendar = session.query(Calendar).filter(
-        Calendar.user_id == user_id,
-        Calendar.year == year
-    ).first()
+    existing_calendar = session.execute(
+            select(Calendar).where(
+                Calendar.user_id == user_id,
+                Calendar.year == year
+            )
+    ).scalar_one_or_none()
 
     if not existing_calendar:
         raise HTTPException(
@@ -41,9 +43,12 @@ def get_dailies_handler(user_id: int, year: int, session : Session = Depends(get
             detail="존재하지 않는 달력입니다."
         )
 
-    existing_dailies = session.query(Daily).filter(
-        Daily.calendar_id == existing_calendar.calendar_id
-    ).all()
+    #존재하는 날짜인지 검사 (404 NOT FOUND)
+    existing_dailies = session.execute(
+        select(Daily).where(
+            Daily.calendar_id == existing_calendar.calendar_id
+        )
+    ).scalars().all()
 
     return existing_dailies
 
@@ -67,10 +72,12 @@ def get_daily_handler(user_id: int, year: int, month: int, day: int, session : S
         )
     
     #존재하는 달력인지 검사 (404 NOT FOUND)
-    existing_calendar = session.query(Calendar).filter(
-        Calendar.user_id == user_id,
-        Calendar.year == year
-    ).first()
+    existing_calendar = session.execute(
+        select(Calendar).where(
+            Calendar.user_id == user_id,
+            Calendar.year == year
+        )
+    ).scalar_one_or_none()
 
     if not existing_calendar:
         raise HTTPException(
@@ -79,11 +86,13 @@ def get_daily_handler(user_id: int, year: int, month: int, day: int, session : S
         )
 
     #존재하는 날짜인지 검사 (404 NOT FOUND)
-    existing_daily = session.query(Daily).filter(
-        Daily.calendar_id == existing_calendar.calendar_id,
-        Daily.month == month,
-        Daily.day == day
-    ).first()
+    existing_daily = session.execute(
+        select(Daily).where(
+            Daily.calendar_id == existing_calendar.calendar_id,
+            Daily.month == month,
+            Daily.day == day
+        )
+    ).scalar_one_or_none()
 
     if not existing_daily:
         raise HTTPException(
@@ -113,10 +122,12 @@ def create_daily_handler(body: DailyCreateRequest, user_id: int, year: int, sess
         )
     
     #존재하는 달력인지 검사 (404 NOT FOUND)
-    existing_calendar = session.query(Calendar).filter(
-        Calendar.year == year,
-        Calendar.user_id == user_id
-    ).first()
+    existing_calendar = session.execute(
+        select(Calendar).where(
+            Calendar.year == year,
+            Calendar.user_id == user_id
+        )
+    ).scalar_one_or_none()
 
     if not existing_calendar:
         raise HTTPException(
@@ -125,11 +136,13 @@ def create_daily_handler(body: DailyCreateRequest, user_id: int, year: int, sess
         )
 
     #동일한 날짜가 존재하는지 중복 검사 (409 CONFLICT)
-    existing_daily = session.query(Daily).filter(
-        Daily.calendar_id == existing_calendar.calendar_id,
-        Daily.month == body.month,
-        Daily.day == body.day
-    ).first()
+    existing_daily = session.execute(
+        select(Daily).where(
+            Daily.calendar_id == existing_calendar.calendar_id,
+            Daily.month == body.month,
+            Daily.day == body.day
+        )
+    ).scalar_one_or_none()
 
     if existing_daily:
         raise HTTPException(
@@ -156,7 +169,6 @@ def create_daily_handler(body: DailyCreateRequest, user_id: int, year: int, sess
     summary = "단일 Daily 삭제"
 )
 def delete_daily_handler(user_id: int, year: int, month: int, day: int, session : Session = Depends(get_db)):
-
     #존재하는 사용자인지 검사 (404 NOT FOUND)
     existing_user = session.execute(
         select(User).where(User.user_id == user_id)
@@ -169,10 +181,12 @@ def delete_daily_handler(user_id: int, year: int, month: int, day: int, session 
         )
 
     #존재하는 달력인지 검사 (404 NOT FOUND)
-    existing_calendar = session.query(Calendar).filter(
-        Calendar.year == year,
-        Calendar.user_id == user_id
-    ).first()
+    existing_calendar = session.execute(
+        select(Calendar).where(
+            Calendar.year == year,
+            Calendar.user_id == user_id
+        )
+    ).scalar_one_or_none()
 
     if not existing_calendar:
         raise HTTPException(
@@ -181,11 +195,13 @@ def delete_daily_handler(user_id: int, year: int, month: int, day: int, session 
         )
 
     #존재하는 날짜인지 검사 (404 NOT FOUND)
-    existing_daily = session.query(Daily).filter(
-        Daily.calendar_id == existing_calendar.calendar_id,
-        Daily.month == month,
-        Daily.day == day
-    ).first()
+    existing_daily = session.execute(
+        select(Daily).where(
+            Daily.calendar_id == existing_calendar.calendar_id,
+            Daily.month == month,
+            Daily.day == day
+        )
+    ).scalar_one_or_none()
 
     if not existing_daily:
         raise HTTPException(
@@ -204,7 +220,7 @@ def delete_daily_handler(user_id: int, year: int, month: int, day: int, session 
     status_code=status.HTTP_204_NO_CONTENT,
     summary = "전체 Daily 삭제"
 )
-def delete_daily_handler(user_id: int, year: int, session : Session = Depends(get_db)):
+def delete_dailies_handler(user_id: int, year: int, session : Session = Depends(get_db)):
     #존재하는 사용자인지 검사 (404 NOT FOUND)
     existing_user = session.execute(
         select(User).where(User.user_id == user_id)
@@ -217,10 +233,12 @@ def delete_daily_handler(user_id: int, year: int, session : Session = Depends(ge
         )
 
     #존재하는 달력인지 검사 (404 NOT FOUND)
-    existing_calendar = session.query(Calendar).filter(
-        Calendar.year == year,
-        Calendar.user_id == user_id
-    ).first()
+    existing_calendar = session.execute(
+        select(Calendar).where(
+            Calendar.year == year,
+            Calendar.user_id == user_id
+        )
+    ).scalar_one_or_none()
 
     if not existing_calendar:
         raise HTTPException(
@@ -229,9 +247,11 @@ def delete_daily_handler(user_id: int, year: int, session : Session = Depends(ge
         )
 
     #존재하는 날짜인지 검사 (404 NOT FOUND)
-    existing_dailies = session.query(Daily).filter(
-        Daily.calendar_id == existing_calendar.calendar_id
-    ).all()
+    existing_dailies = session.execute(
+        select(Daily).where(
+            Daily.calendar_id == existing_calendar.calendar_id
+        )
+    ).scalars().all()
 
     for existing_daily in existing_dailies:
         session.delete(existing_daily)
@@ -260,10 +280,12 @@ def update_daily_handler(body: DailyUpdateRequest, user_id: int, year: int, mont
         )
     
     #존재하는 달력인지 검사 (404 NOT FOUND)
-    existing_calendar = session.query(Calendar).filter(
-        Calendar.year == year,
-        Calendar.user_id == user_id
-    ).first()
+    existing_calendar = session.execute(
+        select(Calendar).where(
+            Calendar.year == year,
+            Calendar.user_id == user_id
+        )
+    ).scalar_one_or_none()
 
     if not existing_calendar:
         raise HTTPException(
@@ -272,11 +294,13 @@ def update_daily_handler(body: DailyUpdateRequest, user_id: int, year: int, mont
         )
 
     #존재하는 날짜인지 검사 (404 NOT FOUND)
-    existing_daily = session.query(Daily).filter(
-        Daily.calendar_id == existing_calendar.calendar_id,
-        Daily.month == month,
-        Daily.day == day
-    ).first()
+    existing_daily = session.execute(
+        select(Daily).where(
+            Daily.calendar_id == existing_calendar.calendar_id,
+            Daily.month == month,
+            Daily.day == day
+        )
+    ).scalar_one_or_none()
 
     if not existing_daily:
         raise HTTPException(
@@ -285,11 +309,13 @@ def update_daily_handler(body: DailyUpdateRequest, user_id: int, year: int, mont
         )
 
     #바꿀 날짜가 이미 존재하는 날짜인지 검사 (409 CONFLICT)
-    duplicate_daily = session.query(Daily).filter(
-        Daily.calendar_id == existing_calendar.calendar_id,
-        Daily.month == body.month,
-        Daily.day == body.day
-    ).first()
+    duplicate_daily = session.execute(
+        select(Daily).where(
+            Daily.calendar_id == existing_calendar.calendar_id,
+            Daily.month == body.month,
+            Daily.day == body.day
+        )
+    ).scalar_one_or_none()
 
     if duplicate_daily:
         raise HTTPException(

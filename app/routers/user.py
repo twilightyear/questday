@@ -15,27 +15,26 @@ router = APIRouter(tags=["User"]) #User 라우터
     response_model = UserSignUpResponse
 )
 def signup_user_handler(body: UserSignUpRequest):
-
     with SessionFactory() as session:
-
         stmt = select(User).where(User.email == body.email)
         existing_user = session.scalar(stmt)
+
         if existing_user:
             raise HTTPException(
                 status_code = status.HTTP_409_CONFLICT,
                 detail = "이미 가입된 이메일입니다."
             )
         hashed_password = hash_password(body.password)
+
         user = User(
             email = body.email,
             hashed_password = hashed_password,
         )
 
-
         session.add(user)
         session.commit()
-
         session.refresh(user)
+        
         return user
 
 #사용자 로그인
