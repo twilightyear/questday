@@ -256,6 +256,7 @@ def delete_category_handler(user_id: int, year: int, month: int, day: int, categ
     #존재하는 카테고리인지 검사 (404 NOT FOUND)
     existing_category = session.execute(
         select(Category).where(
+            Category.daily_id == existing_daily.daily_id,
             Category.category_id == category_id
         )
     ).scalar_one_or_none()
