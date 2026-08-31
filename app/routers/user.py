@@ -10,7 +10,7 @@ from exceptions.handler import NotFoundException, ConflictException, Unauthorize
 
 router = APIRouter(tags=["User"]) #User 라우터
 
-#계정 생성
+#User 생성
 @router.post(
     "/users/signup",
     status_code = status.HTTP_201_CREATED,
@@ -36,7 +36,7 @@ def signup_user_handler(body: UserSignUpRequest, session: Session = Depends(get_
 
     return user
 
-#사용자 로그인
+#User 로그인
 @router.post(
     "/users/login",
     status_code = status.HTTP_200_OK
