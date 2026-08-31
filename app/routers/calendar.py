@@ -6,6 +6,7 @@ from models.calendar import Calendar
 from schema.calendar.calendar_request import CalendarCreateRequest
 from schema.calendar.calendar_response import CalendarResponse
 from sqlalchemy.orm import Session
+from exceptions.handler import NotFoundException, ConflictException
 
 router = APIRouter(tags=["Calendar"])
 
@@ -17,18 +18,15 @@ router = APIRouter(tags=["Calendar"])
     summary = "전체 Calendar 조회"
 )
 def get_calendars_handler(user_id: int, session : Session = Depends(get_db)):
-    #존재하는 사용자인지 검사 (404 NOT FOUND)
+    #존재하는 User 인지 검사 (404 NOT FOUND)
     existing_user = session.execute(
         select(User).where(User.user_id == user_id)
     ).scalar_one_or_none()
 
     if not existing_user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="존재하지 않는 User 입니다."
-        )
+        raise NotFoundException("존재하지 않는 User 입니다.")
     
-    #존재하는 달력인지 검사 (404 NOT FOUND)
+    #존재하는 Calendar 인지 검사 (404 NOT FOUND)
     existing_calendars = session.execute(
         select(Calendar).where(
             Calendar.user_id == user_id
@@ -36,10 +34,7 @@ def get_calendars_handler(user_id: int, session : Session = Depends(get_db)):
     ).scalars().all()
 
     if not existing_calendars:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="존재하지 않는 Calendar 입니다."
-        )
+        raise NotFoundException("존재하지 않는 Calendar 입니다.")
 
     return existing_calendars
 
@@ -51,18 +46,15 @@ def get_calendars_handler(user_id: int, session : Session = Depends(get_db)):
     summary = "단일 Calendar 조회"
 )
 def get_calendar_handler(user_id: int, year: int, session : Session = Depends(get_db)):
-    #존재하는 사용자인지 검사 (404 NOT FOUND)
+    #존재하는 User 인지 검사 (404 NOT FOUND)
     existing_user = session.execute(
         select(User).where(User.user_id == user_id)
     ).scalar_one_or_none()
 
     if not existing_user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="존재하지 않는 User 입니다."
-        )
+        raise NotFoundException("존재하지 않는 User 입니다.")
 
-    #존재하는 달력인지 검사 (404 NOT FOUND)
+    #존재하는 Calendar 인지 검사 (404 NOT FOUND)
     existing_calendar = session.execute(
         select(Calendar).where(
             Calendar.year == year,
@@ -71,10 +63,7 @@ def get_calendar_handler(user_id: int, year: int, session : Session = Depends(ge
     ).scalar_one_or_none()
 
     if not existing_calendar:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="존재하지 않는 Calendar 입니다."
-        )
+        raise NotFoundException("존재하지 않는 Calendar 입니다.")
 
     return existing_calendar
 
@@ -86,18 +75,15 @@ def get_calendar_handler(user_id: int, year: int, session : Session = Depends(ge
     summary = "단일 Calendar 생성"
 )
 def create_calendar_handler(body: CalendarCreateRequest, user_id: int, session : Session = Depends(get_db)):
-    #존재하는 사용자인지 검사 (404 NOT FOUND)
+    #존재하는 User 인지 검사 (404 NOT FOUND)
     existing_user = session.execute(
         select(User).where(User.user_id == user_id)
     ).scalar_one_or_none()
 
     if not existing_user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="존재하지 않는 User 입니다."
-        )
+        raise NotFoundException("존재하지 않는 User 입니다.")
     
-    #동일한 연도의 달력이 존재하는지 중복 검사 (409 CONFLICT)
+    #동일한 year 의 Calendar 가 존재하는지 중복 검사 (409 CONFLICT)
     existing_calendar = session.execute(
         select(Calendar).where(
             Calendar.user_id == user_id,
@@ -106,11 +92,9 @@ def create_calendar_handler(body: CalendarCreateRequest, user_id: int, session :
     ).scalar_one_or_none()
 
     if existing_calendar:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="이미 존재하는 Calendar 입니다."
-        )
+        raise ConflictException("이미 존재하는 Calendar 입니다.")
 
+    #Calendar 추가
     calendar = Calendar(
         user_id = user_id,
         year = body.year
@@ -129,18 +113,15 @@ def create_calendar_handler(body: CalendarCreateRequest, user_id: int, session :
     summary = "단일 Calendar 삭제"
 )
 def delete_calendar_handler(year: int, user_id: int, session : Session = Depends(get_db)):
-    #존재하는 사용자인지 검사 (404 NOT FOUND)
+    #존재하는 User 인지 검사 (404 NOT FOUND)
     existing_user = session.execute(
         select(User).where(User.user_id == user_id)
     ).scalar_one_or_none()
 
     if not existing_user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="존재하지 않는 User 입니다."
-        )
+        raise NotFoundException("존재하지 않는 User 입니다.")
 
-    #존재하는 달력인지 검사 (404 NOT FOUND)
+    #존재하는 Calendar 인지 검사 (404 NOT FOUND)
     existing_calendar = session.execute(
         select(Calendar).where(
             Calendar.year == year,
@@ -149,11 +130,9 @@ def delete_calendar_handler(year: int, user_id: int, session : Session = Depends
     ).scalar_one_or_none()
 
     if not existing_calendar:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="존재하지 않는 Calendar 입니다."
-        )
+        raise NotFoundException("존재하지 않는 Calendar 입니다.")
 
+    #확인된 Calendar 삭제
     session.delete(existing_calendar)
     session.commit()
 
@@ -166,18 +145,15 @@ def delete_calendar_handler(year: int, user_id: int, session : Session = Depends
     summary = "전체 Calendar 삭제"
 )
 def delete_calendars_handler(user_id: int, session : Session = Depends(get_db)):
-    #존재하는 사용자인지 검사 (404 NOT FOUND)
+    #존재하는 User 인지 검사 (404 NOT FOUND)
     existing_user = session.execute(
         select(User).where(User.user_id == user_id)
     ).scalar_one_or_none()
 
     if not existing_user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="존재하지 않는 User 입니다."
-        )
+        raise NotFoundException("존재하지 않는 User 입니다.")
 
-    #존재하는 달력인지 검사 (404 NOT FOUND)
+    #존재하는 Calendar 인지 검사 (404 NOT FOUND)
     existing_calendars = session.execute(
         select(Calendar).where(
             Calendar.user_id == user_id
@@ -185,11 +161,9 @@ def delete_calendars_handler(user_id: int, session : Session = Depends(get_db)):
     ).scalars().all()
 
     if not existing_calendars:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="존재하지 않는 Calendar 입니다."
-        )
+        raise NotFoundException("존재하지 않는 Calendar 입니다.")
 
+    #확인된 Calendar 전부 삭제
     for calendar in existing_calendars:
         session.delete(calendar)
     

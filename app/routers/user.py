@@ -6,6 +6,7 @@ from auth.password import hash_password, verify_password
 from schema.user.user_request import UserSignUpRequest, UserLoginRequest
 from schema.user.user_response import UserSignUpResponse
 from sqlalchemy.orm import Session
+from exceptions.handler import NotFoundException, ConflictException, UnauthorizedException
 
 router = APIRouter(tags=["User"]) #User 라우터
 
@@ -20,10 +21,7 @@ def signup_user_handler(body: UserSignUpRequest, session: Session = Depends(get_
     existing_user = session.scalar(stmt)
 
     if existing_user:
-        raise HTTPException(
-            status_code = status.HTTP_409_CONFLICT,
-            detail = "이미 가입된 이메일입니다."
-        )
+        raise ConflictException("이미 가입된 이메일입니다.")
 
     hashed_password = hash_password(body.password)
 
@@ -48,13 +46,7 @@ def login_user_handler(body: UserLoginRequest, session: Session = Depends(get_db
     user = session.scalar(stmt)
 
     if not user:
-        raise HTTPException(
-            status_code = status.HTTP_401_UNAUTHORIZED,
-            detail = "틀린 이메일 혹은 비밀번호입니다."
-        )
+        raise UnauthorizedException("틀린 이메일 혹은 비밀번호입니다.")
 
     if not verify_password(body.password, user.hashed_password):
-        raise HTTPException(
-            status_code = status.HTTP_401_UNAUTHORIZED,
-            detail = "틀린 이메일 혹은 비밀번호입니다."
-        )
+        raise UnauthorizedException("틀린 이메일 혹은 비밀번호입니다.")
