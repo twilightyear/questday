@@ -134,7 +134,7 @@ def get_category_handler(user_id: int, year: int, month: int, day: int, category
 
 #단일 Category 생성
 @router.post(
-    "/users/{user_id}/calendars/{year}/dailies/{month}/{day}/category/{category_id}",
+    "/users/{user_id}/calendars/{year}/dailies/{month}/{day}/category",
     response_model = CategoryResponse,
     status_code = status.HTTP_201_CREATED,
     summary = "단일 Category 생성"
