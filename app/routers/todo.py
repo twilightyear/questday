@@ -1,7 +1,7 @@
 from fastapi import HTTPException, APIRouter, Depends
 from sqlalchemy import select
 from starlette import status
-from database.db_connection import SessionFactory, get_db
+from database.db_connection import get_db
 from models.user import User
 from models.calendar import Calendar
 from models.daily import Daily

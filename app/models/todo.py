@@ -1,5 +1,4 @@
-from datetime import datetime
-from sqlalchemy import Integer, String, Boolean, ForeignKey, DateTime, func, ForeignKeyConstraint
+from sqlalchemy import String, Boolean, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from database.orm import Base
 
@@ -29,5 +28,5 @@ class Todo(Base):
     )
 
     category: Mapped["Category"] = relationship(
-        back_populates = "todos" #사용자 테이블과 관계 설정 (객체 연결)
+        back_populates = "todos"
     )

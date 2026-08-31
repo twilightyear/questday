@@ -1,6 +1,6 @@
 from fastapi import APIRouter, status, HTTPException, Depends
 from sqlalchemy import select
-from database.db_connection import SessionFactory, get_db
+from database.db_connection import get_db
 from models.user import User
 from models.calendar import Calendar
 from models.daily import Daily
@@ -26,7 +26,7 @@ def get_dailies_handler(user_id: int, year: int, session : Session = Depends(get
     if not existing_user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="존재하는 사용자가 없습니다."
+            detail="존재하지 않는 사용자입니다."
         )
     
     #존재하는 달력인지 검사 (404 NOT FOUND)
@@ -38,7 +38,7 @@ def get_dailies_handler(user_id: int, year: int, session : Session = Depends(get
     if not existing_calendar:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="존재하는 달력이 없습니다."
+            detail="존재하지 않는 달력입니다."
         )
 
     existing_dailies = session.query(Daily).filter(
@@ -63,7 +63,7 @@ def get_daily_handler(user_id: int, year: int, month: int, day: int, session : S
     if not existing_user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="존재하는 사용자가 없습니다."
+            detail="존재하지 않는 사용자입니다."
         )
     
     #존재하는 달력인지 검사 (404 NOT FOUND)
@@ -75,7 +75,7 @@ def get_daily_handler(user_id: int, year: int, month: int, day: int, session : S
     if not existing_calendar:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="존재하는 달력이 없습니다."
+            detail="존재하지 않는 달력입니다."
         )
 
     #존재하는 날짜인지 검사 (404 NOT FOUND)
@@ -88,7 +88,7 @@ def get_daily_handler(user_id: int, year: int, month: int, day: int, session : S
     if not existing_daily:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="존재하는 날짜가 없습니다."
+            detail="존재하지 않는 날짜입니다."
         )
 
     return existing_daily
@@ -190,7 +190,7 @@ def delete_daily_handler(user_id: int, year: int, month: int, day: int, session 
     if not existing_daily:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="존재하는 날짜가 없습니다."
+            detail="존재하지 않는 날짜입니다."
         )
 
     session.delete(existing_daily)
@@ -245,7 +245,7 @@ def delete_daily_handler(user_id: int, year: int, session : Session = Depends(ge
     "/users/{user_id}/calendars/{year}/dailies/{month}/{day}",
     response_model = DailyResponse,
     status_code = status.HTTP_200_OK,
-    summary = "단일 Daily 생성"
+    summary = "단일 Daily 수정"
 )
 def update_daily_handler(body: DailyUpdateRequest, user_id: int, year: int, month: int, day: int, session : Session = Depends(get_db)):
     #존재하는 사용자인지 검사 (404 NOT FOUND)

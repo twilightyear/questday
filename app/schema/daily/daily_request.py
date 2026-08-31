@@ -1,6 +1,5 @@
 from pydantic import BaseModel
 
-
 class DailyCreateRequest(BaseModel):
     month: int
     day: int

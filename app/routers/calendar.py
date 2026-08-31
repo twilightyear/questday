@@ -1,10 +1,9 @@
 from fastapi import APIRouter, status, HTTPException, Depends
 from sqlalchemy import select
-from database.db_connection import SessionFactory, get_db
+from database.db_connection import get_db
 from models.user import User
 from models.calendar import Calendar
-from auth.password import hash_password, verify_password
-from schema.calendar.calendar_request import CalendarCreateRequest, CalendarUpdateRequest
+from schema.calendar.calendar_request import CalendarCreateRequest
 from schema.calendar.calendar_response import CalendarResponse
 from sqlalchemy.orm import Session
 
@@ -37,7 +36,7 @@ def get_calendars_handler(user_id: int, session : Session = Depends(get_db)):
     if not existing_calendars:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="존재하는 달력이 없습니다."
+            detail="존재하지 않는 달력입니다."
         )
 
     return existing_calendars

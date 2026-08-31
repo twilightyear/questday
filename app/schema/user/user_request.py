@@ -1,5 +1,5 @@
 import re
-from pydantic import BaseModel, EmailStr, Field, field_validator, ValidationError
+from pydantic import BaseModel, EmailStr, Field, field_validator
 
 class UserSignUpRequest(BaseModel):
     email: EmailStr = Field(..., description="Email address")

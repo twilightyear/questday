@@ -1,7 +1,7 @@
 from fastapi import HTTPException, APIRouter, Depends
 from sqlalchemy import select
 from starlette import status
-from database.db_connection import SessionFactory, get_db
+from database.db_connection import get_db
 from models.user import User
 from models.calendar import Calendar
 from models.daily import Daily
@@ -263,7 +263,7 @@ def delete_category_handler(user_id: int, year: int, month: int, day: int, categ
     if not existing_category:
         raise HTTPException(
             status_code = status.HTTP_404_NOT_FOUND,
-            detail = "존재하는 카테고리가 없습니다."
+            detail = "존재하지 않는 카테고리입니다."
         )
 
     session.delete(existing_category)
@@ -328,7 +328,7 @@ def delete_categories_handler(user_id: int, year: int, month: int, day: int, ses
     if not existing_categories:
         raise HTTPException(
             status_code = status.HTTP_404_NOT_FOUND,
-            detail = "존재하는 카테고리가 없습니다."
+            detail = "존재하지 않는 카테고리입니다."
         )
 
     for category in existing_categories:
