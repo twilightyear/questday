@@ -1,0 +1,15 @@
+{
+  "name": "Python/Node Development",
+  "portsAttributes": {
+    "8000": {
+      "label": "FastAPI",
+      "onAutoForward": "notify",
+      "visibility": "public"
+    },
+    "5173": {
+      "label": "Vite React",
+      "onAutoForward": "notify",
+      "visibility": "public"
+    }
+  }
+}
