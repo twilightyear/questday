@@ -1,7 +1,6 @@
 from pydantic import BaseModel
 from schema.category.category_response import CategoryResponse
 
-
 class DailyResponse(BaseModel):
     month: int
     day: int

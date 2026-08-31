@@ -1,8 +1,8 @@
-from datetime import datetime
-from sqlalchemy import Integer, String, Boolean, ForeignKey, DateTime, func, UniqueConstraint
+from sqlalchemy import ForeignKey, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from database.orm import Base
 
+#Calendar 테이블 구조
 class Calendar(Base):
     __tablename__ = "calendar"
 
@@ -21,12 +21,10 @@ class Calendar(Base):
         UniqueConstraint("user_id", "year", name="uq_user_calendar_year"),
     )
 
-    #가상속성 : user
     user: Mapped["User"] = relationship(
         back_populates="calendars"
     )
 
-    #가상속성 : user
     dailies: Mapped[list["Daily"]] = relationship(
         back_populates="calendar",
         cascade = "all, delete-orphan"

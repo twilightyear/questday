@@ -1,7 +1,7 @@
 from fastapi import HTTPException, APIRouter, Depends
 from sqlalchemy import select
 from starlette import status
-from database.db_connection import SessionFactory, get_db
+from database.db_connection import get_db
 from models.user import User
 from models.calendar import Calendar
 from models.daily import Daily
@@ -10,6 +10,7 @@ from models.todo import Todo
 from schema.todo.todo_request import TodoCreateRequest, TodoUpdateRequest
 from schema.todo.todo_response import TodoResponse
 from sqlalchemy.orm import Session
+from exceptions.handler import NotFoundException
 
 router = APIRouter(tags = ["Todo"]) #Todo 라우터
 
@@ -21,18 +22,15 @@ router = APIRouter(tags = ["Todo"]) #Todo 라우터
     summary = "전체 Todo 조회"
 )
 def get_todos_handler(user_id: int, year: int, month: int, day: int, category_id: int, session : Session = Depends(get_db)):
-    #존재하는 사용자인지 검사 (404 NOT FOUND)
+    #존재하는 User 인지 검사 (404 NOT FOUND)
     existing_user = session.execute(
         select(User).where(User.user_id == user_id)
     ).scalar_one_or_none()
 
     if not existing_user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="존재하지 않는 사용자입니다."
-        )
+        raise NotFoundException("존재하지 않는 User 입니다.")
     
-    #존재하는 달력인지 검사 (404 NOT FOUND)
+    #존재하는 Calendar 인지 검사 (404 NOT FOUND)
     existing_calendar = session.execute(
         select(Calendar).where(
             Calendar.user_id == user_id,
@@ -41,12 +39,9 @@ def get_todos_handler(user_id: int, year: int, month: int, day: int, category_id
     ).scalar_one_or_none()
 
     if not existing_calendar:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="존재하지 않는 달력입니다."
-        )
+        raise NotFoundException("존재하지 않는 Calendar 입니다.")
 
-    #존재하는 날짜인지 검사 (404 NOT FOUND)
+    #존재하는 Daily 인지 검사 (404 NOT FOUND)
     existing_daily = session.execute(
         select(Daily).where(
             Daily.calendar_id == existing_calendar.calendar_id,
@@ -56,12 +51,9 @@ def get_todos_handler(user_id: int, year: int, month: int, day: int, category_id
     ).scalar_one_or_none()
 
     if not existing_daily:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="존재하지 않는 날짜입니다."
-        )
+        raise NotFoundException("존재하지 않는 Daily 입니다.")
     
-    #존재하는 카테고리인지 검사 (404 NOT FOUND)
+    #존재하는 Category 인지 검사 (404 NOT FOUND)
     existing_category = session.execute(
         select(Category).where(
             Category.daily_id == existing_daily.daily_id,
@@ -70,10 +62,7 @@ def get_todos_handler(user_id: int, year: int, month: int, day: int, category_id
     ).scalar_one_or_none()
 
     if not existing_category:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="존재하지 않는 카테고리입니다."
-        )
+        raise NotFoundException("존재하지 않는 Category 입니다.")
 
     #존재하는 모든 Todo 조회 (없으면 빈 리스트 반환)
     existing_todos = session.execute(
@@ -92,18 +81,15 @@ def get_todos_handler(user_id: int, year: int, month: int, day: int, category_id
     summary = "단일 Todo 생성"
 )
 def create_todo_handler(body: TodoCreateRequest, user_id: int, year: int, month: int, day: int, category_id: int, session : Session = Depends(get_db)):
-    #존재하는 사용자인지 검사 (404 NOT FOUND)
+    #존재하는 User 인지 검사 (404 NOT FOUND)
     existing_user = session.execute(
         select(User).where(User.user_id == user_id)
     ).scalar_one_or_none()
 
     if not existing_user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="존재하지 않는 사용자입니다."
-        )
+        raise NotFoundException("존재하지 않는 User 입니다.")
     
-    #존재하는 달력인지 검사 (404 NOT FOUND)
+    #존재하는 Calendar 인지 검사 (404 NOT FOUND)
     existing_calendar = session.execute(
         select(Calendar).where(
             Calendar.user_id == user_id,
@@ -112,12 +98,9 @@ def create_todo_handler(body: TodoCreateRequest, user_id: int, year: int, month:
     ).scalar_one_or_none()
 
     if not existing_calendar:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="존재하지 않는 달력입니다."
-        )
+        raise NotFoundException("존재하지 않는 Calendar 입니다.")
 
-    #존재하는 날짜인지 검사 (404 NOT FOUND)
+    #존재하는 Daily 인지 검사 (404 NOT FOUND)
     existing_daily = session.execute(
         select(Daily).where(
             Daily.calendar_id == existing_calendar.calendar_id,
@@ -127,12 +110,9 @@ def create_todo_handler(body: TodoCreateRequest, user_id: int, year: int, month:
     ).scalar_one_or_none()
 
     if not existing_daily:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="존재하지 않는 날짜입니다."
-        )
+        raise NotFoundException("존재하지 않는 Daily 입니다.")
     
-    #존재하는 카테고리인지 검사 (404 NOT FOUND)
+    #존재하는 Category 인지 검사 (404 NOT FOUND)
     existing_category = session.execute(
         select(Category).where(
             Category.daily_id == existing_daily.daily_id,
@@ -141,12 +121,9 @@ def create_todo_handler(body: TodoCreateRequest, user_id: int, year: int, month:
     ).scalar_one_or_none()
 
     if not existing_category:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="존재하지 않는 카테고리입니다."
-        )
+        raise NotFoundException("존재하지 않는 Category 입니다.")
 
-    #할일 추가
+    #Todo 추가
     todo = Todo(
         category_id = existing_category.category_id,
         title = body.title,
@@ -167,18 +144,15 @@ def create_todo_handler(body: TodoCreateRequest, user_id: int, year: int, month:
     summary = "단일 Todo 삭제"
 )
 def delete_todo_handler(user_id: int, year: int, month: int, day: int, category_id: int, todo_id: int, session : Session = Depends(get_db)):
-    #존재하는 사용자인지 검사 (404 NOT FOUND)
+    #존재하는 User 인지 검사 (404 NOT FOUND)
     existing_user = session.execute(
         select(User).where(User.user_id == user_id)
     ).scalar_one_or_none()
 
     if not existing_user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="존재하지 않는 사용자입니다."
-        )
+        raise NotFoundException("존재하지 않는 User 입니다.")
     
-    #존재하는 달력인지 검사 (404 NOT FOUND)
+    #존재하는 Calendar 인지 검사 (404 NOT FOUND)
     existing_calendar = session.execute(
         select(Calendar).where(
             Calendar.user_id == user_id,
@@ -187,12 +161,9 @@ def delete_todo_handler(user_id: int, year: int, month: int, day: int, category_
     ).scalar_one_or_none()
 
     if not existing_calendar:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="존재하지 않는 달력입니다."
-        )
+        raise NotFoundException("존재하지 않는 Calendar 입니다.")
 
-    #존재하는 날짜인지 검사 (404 NOT FOUND)
+    #존재하는 Daily 인지 검사 (404 NOT FOUND)
     existing_daily = session.execute(
         select(Daily).where(
             Daily.calendar_id == existing_calendar.calendar_id,
@@ -202,12 +173,9 @@ def delete_todo_handler(user_id: int, year: int, month: int, day: int, category_
     ).scalar_one_or_none()
 
     if not existing_daily:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="존재하지 않는 날짜입니다."
-        )
+        raise NotFoundException("존재하지 않는 Daily 입니다.")
     
-    #존재하는 카테고리인지 검사 (404 NOT FOUND)
+    #존재하는 Category 인지 검사 (404 NOT FOUND)
     existing_category = session.execute(
         select(Category).where(
             Category.daily_id == existing_daily.daily_id,
@@ -216,12 +184,9 @@ def delete_todo_handler(user_id: int, year: int, month: int, day: int, category_
     ).scalar_one_or_none()
 
     if not existing_category:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="존재하지 않는 카테고리입니다."
-        )
+        raise NotFoundException("존재하지 않는 Category 입니다.")
 
-    #존재하는 할일인지 검사 (404 NOT FOUND)
+    #존재하는 Todo 인지 검사 (404 NOT FOUND)
     existing_todo = session.execute(
         select(Todo).where(
             Todo.category_id == existing_category.category_id,
@@ -230,10 +195,7 @@ def delete_todo_handler(user_id: int, year: int, month: int, day: int, category_
     ).scalar_one_or_none()
 
     if not existing_todo:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="존재하지 않는 할일입니다."
-        )
+        raise NotFoundException("존재하지 않는 Todo 입니다.")
 
     #할일 삭제
     session.delete(existing_todo)
@@ -248,18 +210,15 @@ def delete_todo_handler(user_id: int, year: int, month: int, day: int, category_
     summary = "전체 Todo 삭제"
 )
 def delete_todos_handler(user_id: int, year: int, month: int, day: int, category_id: int, session : Session = Depends(get_db)):
-    #존재하는 사용자인지 검사 (404 NOT FOUND)
+    #존재하는 User 인지 검사 (404 NOT FOUND)
     existing_user = session.execute(
         select(User).where(User.user_id == user_id)
     ).scalar_one_or_none()
 
     if not existing_user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="존재하지 않는 사용자입니다."
-        )
+        raise NotFoundException("존재하지 않는 User 입니다.")
     
-    #존재하는 달력인지 검사 (404 NOT FOUND)
+    #존재하는 Calendar 인지 검사 (404 NOT FOUND)
     existing_calendar = session.execute(
         select(Calendar).where(
             Calendar.user_id == user_id,
@@ -268,12 +227,9 @@ def delete_todos_handler(user_id: int, year: int, month: int, day: int, category
     ).scalar_one_or_none()
 
     if not existing_calendar:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="존재하지 않는 달력입니다."
-        )
+        raise NotFoundException("존재하지 않는 Calendar 입니다.")
 
-    #존재하는 날짜인지 검사 (404 NOT FOUND)
+    #존재하는 Daily 인지 검사 (404 NOT FOUND)
     existing_daily = session.execute(
         select(Daily).where(
             Daily.calendar_id == existing_calendar.calendar_id,
@@ -283,12 +239,9 @@ def delete_todos_handler(user_id: int, year: int, month: int, day: int, category
     ).scalar_one_or_none()
 
     if not existing_daily:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="존재하지 않는 날짜입니다."
-        )
+        raise NotFoundException("존재하지 않는 Daily 입니다.")
     
-    #존재하는 카테고리인지 검사 (404 NOT FOUND)
+    #존재하는 Category 인지 검사 (404 NOT FOUND)
     existing_category = session.execute(
         select(Category).where(
             Category.daily_id == existing_daily.daily_id,
@@ -297,12 +250,9 @@ def delete_todos_handler(user_id: int, year: int, month: int, day: int, category
     ).scalar_one_or_none()
 
     if not existing_category:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="존재하지 않는 카테고리입니다."
-        )
+        raise NotFoundException("존재하지 않는 Category 입니다.")
 
-    #존재하는 할일인지 검사 (404 NOT FOUND)
+    #존재하는 Todo 인지 검사 (404 NOT FOUND)
     existing_todos = session.execute(
         select(Todo).where(
             Todo.category_id == existing_category.category_id
@@ -310,12 +260,9 @@ def delete_todos_handler(user_id: int, year: int, month: int, day: int, category
     ).scalars().all()
 
     if not existing_todos:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="존재하지 않는 할일입니다."
-        )
+        raise NotFoundException("존재하지 않는 Todo 입니다.")
 
-    #할일 삭제
+    #Todo 삭제
     for todo in existing_todos:
         session.delete(todo)
 
@@ -331,18 +278,15 @@ def delete_todos_handler(user_id: int, year: int, month: int, day: int, category
     summary = "단일 Todo 수정"
 )
 def update_todo_handler(body: TodoUpdateRequest, user_id: int, year: int, month: int, day: int, category_id: int, todo_id: int, session : Session = Depends(get_db)):
-    #존재하는 사용자인지 검사 (404 NOT FOUND)
+    #존재하는 User 인지 검사 (404 NOT FOUND)
     existing_user = session.execute(
         select(User).where(User.user_id == user_id)
     ).scalar_one_or_none()
 
     if not existing_user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="존재하지 않는 사용자입니다."
-        )
+        raise NotFoundException("존재하지 않는 User 입니다.")
     
-    #존재하는 달력인지 검사 (404 NOT FOUND)
+    #존재하는 Calendar 인지 검사 (404 NOT FOUND)
     existing_calendar = session.execute(
         select(Calendar).where(
             Calendar.user_id == user_id,
@@ -351,12 +295,9 @@ def update_todo_handler(body: TodoUpdateRequest, user_id: int, year: int, month:
     ).scalar_one_or_none()
 
     if not existing_calendar:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="존재하지 않는 달력입니다."
-        )
+        raise NotFoundException("존재하지 않는 Calendar 입니다.")
 
-    #존재하는 날짜인지 검사 (404 NOT FOUND)
+    #존재하는 Daily 인지 검사 (404 NOT FOUND)
     existing_daily = session.execute(
         select(Daily).where(
             Daily.calendar_id == existing_calendar.calendar_id,
@@ -366,12 +307,9 @@ def update_todo_handler(body: TodoUpdateRequest, user_id: int, year: int, month:
     ).scalar_one_or_none()
 
     if not existing_daily:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="존재하지 않는 날짜입니다."
-        )
+        raise NotFoundException("존재하지 않는 Daily 입니다.")
     
-    #존재하는 카테고리인지 검사 (404 NOT FOUND)
+    #존재하는 Category 인지 검사 (404 NOT FOUND)
     existing_category = session.execute(
         select(Category).where(
             Category.daily_id == existing_daily.daily_id,
@@ -380,12 +318,9 @@ def update_todo_handler(body: TodoUpdateRequest, user_id: int, year: int, month:
     ).scalar_one_or_none()
 
     if not existing_category:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="존재하지 않는 카테고리입니다."
-        )
+        raise NotFoundException("존재하지 않는 Category 입니다.")
 
-    #존재하는 할일인지 검사 (404 NOT FOUND)
+    #존재하는 Todo 인지 검사 (404 NOT FOUND)
     existing_todo = session.execute(
         select(Todo).where(
             Todo.category_id == existing_category.category_id,
@@ -394,10 +329,7 @@ def update_todo_handler(body: TodoUpdateRequest, user_id: int, year: int, month:
     ).scalar_one_or_none()
 
     if not existing_todo:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="존재하지 않는 할일입니다."
-        )
+        raise NotFoundException("존재하지 않는 Todo 입니다.")
 
     #할일 수정
     existing_todo.title = body.title

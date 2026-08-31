@@ -1,6 +1,5 @@
 from pydantic import BaseModel
 
-
 class TodoResponse(BaseModel):
     todo_id: int
     title: str
