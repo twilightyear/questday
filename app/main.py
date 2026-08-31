@@ -8,6 +8,8 @@ from routers.category import router as category_router
 from routers.todo import router as todo_router
 from exceptions.handler import add_exception_handlers
 
+from fastapi.middleware.cors import CORSMiddleware
+
 #데이터베이스 연결 및 동기화
 #Base.metadata.drop_all(bind=engine)
 Base.metadata.create_all(bind = engine)
@@ -23,3 +25,11 @@ app.include_router(category_router)
 app.include_router(todo_router)
 
 add_exception_handlers(app)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
