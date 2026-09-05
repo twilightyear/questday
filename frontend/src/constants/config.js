@@ -1,0 +1,1 @@
+export const USER_ID = 1; //테스트용 user_id 하드 코딩
