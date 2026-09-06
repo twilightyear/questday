@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import StreakGrid from '../components/StreakGrid';
 import { USER_ID } from '../constants/config';
 import { getCalendars } from '../apis/calendarApi';
+import MonthCalendar from '../components/MonthCalendar';
 
 export default function MainPage() {
     const [calendarData, setCalendarData] = useState([]);
@@ -23,6 +24,7 @@ export default function MainPage() {
     return (
         <div>
             <StreakGrid calendarData={calendarData} />
+            <MonthCalendar calendarData={calendarData} />
         </div>
     );
 }
