@@ -13,21 +13,21 @@ export default function StreakGrid({ calendarData = [] }) {
     const allTodos = daily.categories.flatMap((category) => category.todos);
     const hasTodos = allTodos.length > 0;
 
-    //모든 todo.is_done 이 True 여야만 값 반영
+    //모든 todo.is_done 이 True 여야만 값 반영 로작
     const isAllDone = hasTodos && allTodos.every((todo) => todo.is_done);
     const totalTodoCount = isAllDone ? allTodos.length : 0;
     
-    //M-D 형식으로 acc 에 저장
+    //M-D 형식으로 acc 에 저장하는 로직
     const key = `${daily.month}-${daily.day}`;
     acc[key] = totalTodoCount;
 
     return acc
   }, {});
 
-  //할일 개수에 따른 색상 강도 조절
+  //할일 개수에 따른 색상 강도 조절하는 로직
   const getStreakColor = (count) => {
     if (!count || count == 0){
-      return 'bg-gray-100';
+      return 'bg-gray-500';
     }else if(count <= 1){
       return 'bg-green-200';
     }else if(count <= 3){
@@ -42,10 +42,10 @@ export default function StreakGrid({ calendarData = [] }) {
   }
 
   return (
-    <div className="bg-gray-500 p-6 rounded-xl shadow-sm">
-      <h3 className="text-lg mb-4 text-white font-semibold">
-        {currentYear} Streak
-      </h3>
+    <div className="w-1/1 h-1/1 py-2 bg-slate-950 px-3 rounded-xl shadow-sm">
+      {/* 컴포넌트 상단 */}
+      <div className="text-lg text-center text-white mb-2 font-semibold">{currentYear} 기록</div>
+      {/* Streak Grid */}
       <div className="grid grid-rows-7 grid-flow-col gap-0.5">
         {Array.from({ length: daysInYear }).map((_, index) => {
           const currentDate = new Date(currentYear, 0, 1 + index);
@@ -57,10 +57,12 @@ export default function StreakGrid({ calendarData = [] }) {
 
           const dateString = `${currentYear}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 
+          //각 Daily 박스 생성 로직
           return (
+            
             <div 
               key={dateString} 
-              className={`w-4 h-4 rounded-md ${getStreakColor(count)}`}
+              className={`w-2 h-2 rounded-md ${getStreakColor(count)}`}
               title={`${dateString}: Todo Count : ${count}`}
             />
           );
