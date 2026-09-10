@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getCurrentYear, getCurrentMonth } from '../utils/util_functions';
 
-export default function MonthCalendar({calendarData}){
+export default function MonthCalendar({calendarData, onSelectedDate}){
     const currentYear = getCurrentYear();
     const currentMonth = getCurrentMonth();
 
@@ -76,6 +76,13 @@ export default function MonthCalendar({calendarData}){
         }
     };
 
+    //Click 한 날짜처리
+    const handleClickDate = (day) => {
+        if (onSelectedDate) {
+            onSelectedDate(year, month, day);
+        }
+    };
+
     return (
         <div className="h-1/1 w-1/1  bg-slate-950 p-6 rounded-2xl shadow-sm border border-slate-800">
             {/* 컴포넌트 상단 영역 */}
@@ -120,6 +127,7 @@ export default function MonthCalendar({calendarData}){
                     //각 Daily 박스 생성 로직
                     return (
                         <div 
+                            onClick={() => handleClickDate(day)}
                             key={day} 
                             className={`h-14 border rounded-xl flex flex-col justify-between p-2 transition-all cursor-pointer ${colorClass}`}
                         >
