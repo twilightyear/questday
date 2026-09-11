@@ -1,4 +1,4 @@
-from fastapi import HTTPException, APIRouter, Depends
+from fastapi import HTTPException, APIRouter, Depends, Request
 from sqlalchemy import select
 from starlette import status
 from database.db_connection import get_db
@@ -15,19 +15,14 @@ router = APIRouter(tags = ["Category"]) #Category 라우터
 
 #전체 Category 조회
 @router.get(
-    "/users/{user_id}/calendars/{year}/dailies/{month}/{day}/category",
+    "/calendar/{year}/daily/{month}/{day}/category",
     response_model = list[CategoryResponse],
     status_code = status.HTTP_200_OK,
     summary = "전체 Category 조회"
 )
-def get_categories_handler(user_id: int, year: int, month: int, day: int, session : Session = Depends(get_db)):
-    #존재하는 User 인지 검사 (404 NOT FOUND)
-    existing_user = session.execute(
-        select(User).where(User.user_id == user_id)
-    ).scalar_one_or_none()
-
-    if not existing_user:
-        raise NotFoundException("존재하지 않는 User 입니다.")
+def get_categories_handler(request: Request, year: int, month: int, day: int, session : Session = Depends(get_db)):
+    #Cookie 기반 User ID 받아오기
+    user_id = request.session.get("user_id")
     
     #존재하는 Calendar 인지 검사 (404 NOT FOUND)
     existing_calendar = session.execute(
@@ -63,19 +58,14 @@ def get_categories_handler(user_id: int, year: int, month: int, day: int, sessio
 
 #단일 Category 조회
 @router.get(
-    "/users/{user_id}/calendars/{year}/dailies/{month}/{day}/category/{category_id}",
+    "/calendar/{year}/daily/{month}/{day}/category/{category_id}",
     response_model = CategoryResponse,
     status_code = status.HTTP_200_OK,
     summary = "단일 Category 조회"
 )
-def get_category_handler(user_id: int, year: int, month: int, day: int, category_id: int, session : Session = Depends(get_db)):
-    #존재하는 User 인지 검사 (404 NOT FOUND)
-    existing_user = session.execute(
-        select(User).where(User.user_id == user_id)
-    ).scalar_one_or_none()
-
-    if not existing_user:
-        raise NotFoundException("존재하지 않는 User 입니다.")
+def get_category_handler(request: Request, year: int, month: int, day: int, category_id: int, session : Session = Depends(get_db)):
+    #Cookie 기반 User ID 받아오기
+    user_id = request.session.get("user_id")
     
     #존재하는 Calendar 인지 검사 (404 NOT FOUND)
     existing_calendar = session.execute(
@@ -115,19 +105,14 @@ def get_category_handler(user_id: int, year: int, month: int, day: int, category
 
 #단일 Category 생성
 @router.post(
-    "/users/{user_id}/calendars/{year}/dailies/{month}/{day}/category",
+    "/calendar/{year}/daily/{month}/{day}/category",
     response_model = CategoryResponse,
     status_code = status.HTTP_201_CREATED,
     summary = "단일 Category 생성"
 )
-def create_category_handler(body: CategoryCreateRequest, user_id: int, year: int, month: int, day: int, session : Session = Depends(get_db)):
-    #존재하는 User 인지 검사 (404 NOT FOUND)
-    existing_user = session.execute(
-        select(User).where(User.user_id == user_id)
-    ).scalar_one_or_none()
-
-    if not existing_user:
-        raise NotFoundException("존재하지 않는 User 입니다.")
+def create_category_handler(body: CategoryCreateRequest, request: Request, year: int, month: int, day: int, session : Session = Depends(get_db)):
+    #Cookie 기반 User ID 받아오기
+    user_id = request.session.get("user_id")
     
     #존재하는 Calendar 인지 검사 (404 NOT FOUND)
     existing_calendar = session.execute(
@@ -178,18 +163,13 @@ def create_category_handler(body: CategoryCreateRequest, user_id: int, year: int
 
 #단일 Category 삭제
 @router.delete(
-    "/users/{user_id}/calendars/{year}/dailies/{month}/{day}/category/{category_id}",
+    "/calendar/{year}/daily/{month}/{day}/category/{category_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     summary = "단일 Category 삭제"
 )
-def delete_category_handler(user_id: int, year: int, month: int, day: int, category_id: int, session : Session = Depends(get_db)):
-    #존재하는 User 인지 검사 (404 NOT FOUND)
-    existing_user = session.execute(
-        select(User).where(User.user_id == user_id)
-    ).scalar_one_or_none()
-
-    if not existing_user:
-        raise NotFoundException("존재하지 않는 User 입니다.")
+def delete_category_handler(request: Request, year: int, month: int, day: int, category_id: int, session : Session = Depends(get_db)):
+    #Cookie 기반 User ID 받아오기
+    user_id = request.session.get("user_id")
 
     #존재하는 Calendar 인지 검사 (404 NOT FOUND)
     existing_calendar = session.execute(
@@ -233,18 +213,13 @@ def delete_category_handler(user_id: int, year: int, month: int, day: int, categ
 
 #전체 Category 삭제
 @router.delete(
-    "/users/{user_id}/calendars/{year}/dailies/{month}/{day}/category",
+    "/calendar/{year}/daily/{month}/{day}/category",
     status_code=status.HTTP_204_NO_CONTENT,
     summary = "전체 Category 삭제"
 )
-def delete_categories_handler(user_id: int, year: int, month: int, day: int, session : Session = Depends(get_db)):
-    #존재하는 User 인지 검사 (404 NOT FOUND)
-    existing_user = session.execute(
-        select(User).where(User.user_id == user_id)
-    ).scalar_one_or_none()
-
-    if not existing_user:
-        raise NotFoundException("존재하지 않는 User 입니다.")
+def delete_categories_handler(request: Request, year: int, month: int, day: int, session : Session = Depends(get_db)):
+    #Cookie 기반 User ID 받아오기
+    user_id = request.session.get("user_id")
 
     #존재하는 Calendar 인지 검사 (404 NOT FOUND)
     existing_calendar = session.execute(
@@ -289,19 +264,14 @@ def delete_categories_handler(user_id: int, year: int, month: int, day: int, ses
 
 #단일 Category 수정
 @router.patch(
-    "/users/{user_id}/calendars/{year}/dailies/{month}/{day}/category/{category_id}",
+    "/calendar/{year}/daily/{month}/{day}/category/{category_id}",
     response_model = CategoryResponse,
     status_code = status.HTTP_200_OK,
     summary = "단일 Category 수정"
 )
-def update_category_handler(body: CategoryUpdateRequest, user_id: int, year: int, month: int, day: int, category_id: int, session : Session = Depends(get_db)):
-    #존재하는 User 인지 검사 (404 NOT FOUND)
-    existing_user = session.execute(
-        select(User).where(User.user_id == user_id)
-    ).scalar_one_or_none()
-
-    if not existing_user:
-        raise NotFoundException("존재하지 않는 User 입니다.")
+def update_category_handler(body: CategoryUpdateRequest, request: Request, year: int, month: int, day: int, category_id: int, session : Session = Depends(get_db)):
+    #Cookie 기반 User ID 받아오기
+    user_id = request.session.get("user_id")
 
     #존재하는 Calendar 인지 검사 (404 NOT FOUND)
     existing_calendar = session.execute(
