@@ -20,26 +20,26 @@ export default function SignupPage() {
         }
     }
 
-  const handleSignup = async (e) => {
-    e.preventDefault();
-    if (!isFormValid || !isPasswordValid) return;
+    const handleSignup = async (e) => {
+        e.preventDefault();
+        if (!isFormValid || !isPasswordValid) return;
 
-    try {
-      const userData = {
-        email : email,
-        password : password
-      }
+        try {
+            const userData = {
+            email : email,
+            password : password
+        }
 
-      const response = await userSignup(userData);
+        const response = await userSignup(userData);
 
-      console.log("회원가입 성공:", response.data);
-      navigate("/");
+        console.log("회원가입 성공:", response.data);
+        navigate("/");
       
-    } catch (error) {
-      console.error("회원가입 실패:", error);
-      alert("회원가입에 실패했습니다. 아이디와 비밀번호를 확인해주세요.");
-    }
-  };
+        } catch (error) {
+            console.error("회원가입 실패:", error);
+            alert("회원가입에 실패했습니다. 아이디와 비밀번호를 확인해주세요.");
+        }
+    };
 
     const RouteLoginPage = async (e) => {
         e.preventDefault();
