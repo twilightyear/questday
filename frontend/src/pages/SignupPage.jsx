@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { userSignup } from '../apis/userApi';
+import { createCalendar } from '../apis/calendarApi';
+import { getCurrentYear } from '../utils/util_functions';
 
 export default function SignupPage() {
     const [email, setEmail] = useState('');
@@ -20,26 +22,37 @@ export default function SignupPage() {
         }
     }
 
-  const handleSignup = async (e) => {
-    e.preventDefault();
-    if (!isFormValid || !isPasswordValid) return;
+    const handleCreateCalendar = async () => {
+        try {
+            const yearData = {
+                year : getCurrentYear()
+            }
+            await createCalendar(yearData);
+            } catch (err){
+                console.log(err);
+            }
+        };
 
-    try {
-      const userData = {
-        email : email,
-        password : password
-      }
+    const handleSignup = async (e) => {
+        e.preventDefault();
+        if (!isFormValid || !isPasswordValid) return;
 
-      const response = await userSignup(userData);
+        try {
+            const userData = {
+            email : email,
+            password : password
+        }
 
-      console.log("회원가입 성공:", response.data);
-      navigate("/");
+        const response = await userSignup(userData);
+
+        console.log("회원가입 성공:", response.data);
+        navigate("/");
       
-    } catch (error) {
-      console.error("회원가입 실패:", error);
-      alert("회원가입에 실패했습니다. 아이디와 비밀번호를 확인해주세요.");
-    }
-  };
+        } catch (error) {
+            console.error("회원가입 실패:", error);
+            alert("회원가입에 실패했습니다. 아이디와 비밀번호를 확인해주세요.");
+        }
+    };
 
     const RouteLoginPage = async (e) => {
         e.preventDefault();
