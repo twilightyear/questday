@@ -9,6 +9,7 @@ export default function MonthCalendar({calendarData, onSelectedDate}){
     const [year, setYear] = useState(currentYear);
     const [month, setMonth] = useState(currentMonth);
 
+
     const daysOfWeek = ['일','월','화','수','목','금','토'];
 
     //이전 달로 달력을 넘기는 버튼 로직

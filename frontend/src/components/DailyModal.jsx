@@ -56,7 +56,7 @@ export default function DailyModal({ calendarData, selectedDate, onClose , onDel
     return (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
             <div className="bg-slate-900 border border-slate-800 w-full max-w-3xl rounded-2xl p-6 shadow-2xl flex flex-col max-h-[80vh] max-w-[80vh] overflow-y-auto ">
-                <h2>{year}-{month}-{day}</h2>
+                <span className="text-slate-300 text-lg font-bold">{year} - {month} - {day}</span>
                 <div className="grid grid-cols-2 gap-4 my-4">
                 {   
                     targetDailyData?.categories?.map((category, category_idx) => (
