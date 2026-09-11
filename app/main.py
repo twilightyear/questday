@@ -19,7 +19,7 @@ if not SECRET_KEY:
     raise ValueError("SECRET_KEY 환경 변수가 설정되지 않았습니다.")
 
 #데이터베이스 연결 및 동기화
-#Base.metadata.drop_all(bind=engine)
+Base.metadata.drop_all(bind=engine)
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()

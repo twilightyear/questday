@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { userSignup } from '../apis/userApi';
-import { createCalendar } from '../apis/calendarApi';
-import { getCurrentYear } from '../utils/util_functions';
 
 export default function SignupPage() {
     const [email, setEmail] = useState('');
@@ -21,17 +19,6 @@ export default function SignupPage() {
             setCheckPassword('');
         }
     }
-
-    const handleCreateCalendar = async () => {
-        try {
-            const yearData = {
-                year : getCurrentYear()
-            }
-            await createCalendar(yearData);
-            } catch (err){
-                console.log(err);
-            }
-        };
 
     const handleSignup = async (e) => {
         e.preventDefault();

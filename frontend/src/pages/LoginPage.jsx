@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { userLogin } from '../apis/userApi';
+import { getCurrentYear } from '../utils/util_functions';
+import { getCalendar, createCalendar  } from '../apis/calendarApi';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -13,6 +15,21 @@ export default function LoginPage() {
     e.preventDefault();
     navigate("/signup");
   }
+
+  const checkCreateCalendar = async () => {
+    try {
+      await getCalendar(getCurrentYear());
+      return;
+    } catch (err) {
+      if (err.response && err.response.status === 404){
+        const yearData = {
+          year : getCurrentYear()
+        }
+        await createCalendar(yearData);
+        return;
+      }
+    }
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -27,6 +44,7 @@ export default function LoginPage() {
       const response = await userLogin(userData);
 
       console.log("로그인 성공:", response.data);
+      await checkCreateCalendar()
       navigate("/main");
       
     } catch (error) {
