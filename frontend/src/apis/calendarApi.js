@@ -1,26 +1,26 @@
 import { api } from './client';
 
-export const getCalendars = async (userId) => {
-  const response = await api.get(`/users/${userId}/calendars`);
+export const getCalendars = async () => {
+  const response = await api.get(`/calendar`);
   return response.data;
 };
 
-export const getCalendar = async (userId, year) => {
-  const response = await api.get(`/users/${userId}/calendars/${year}`);
+export const getCalendar = async (year) => {
+  const response = await api.get(`/calendar/${year}`);
   return response.data;
 };
 
-export const createCalendar = async (userId, calendarData) => {
-  const response = await api.post(`/users/${userId}/calendars`, calendarData);
+export const createCalendar = async (calendarData) => {
+  const response = await api.post(`/calendar`, calendarData);
   return response.data;
 };
 
-export const deleteCalendar = async (userId, year) => {
-  const response = await api.delete(`/users/${userId}/calendars/${year}`);
+export const deleteCalendar = async (year) => {
+  const response = await api.delete(`/calendar/${year}`);
   return response.data;
 };
 
-export const deleteCalendars = async (userId) => {
-  const response = await api.delete(`/users/${userId}/calendars`);
+export const deleteCalendars = async () => {
+  const response = await api.delete(`/calendar`);
   return response.data;
 };

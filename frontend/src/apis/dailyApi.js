@@ -1,31 +1,31 @@
 import { api } from './client';
 
-export const getDailies = async (userId, year) => {
-  const response = await api.get(`/users/${userId}/calendars/${year}/dailies`);
+export const getDailies = async (year) => {
+  const response = await api.get(`/calendar/${year}/daily`);
   return response.data;
 };
 
-export const getDaily = async (userId, year, month, day) => {
-  const response = await api.get(`/users/${userId}/calendars/${year}/dailies/${month}/${day}`);
+export const getDaily = async (year, month, day) => {
+  const response = await api.get(`/calendar/${year}/daily/${month}/${day}`);
   return response.data;
 };
 
-export const createDaily = async (userId, year, dailyData) => {
-  const response = await api.post(`/users/${userId}/calendars/${year}/dailies`, dailyData);
+export const createDaily = async (year, dailyData) => {
+  const response = await api.post(`/calendar/${year}/daily`, dailyData);
   return response.data;
 };
 
-export const deleteDaily = async (userId, year, month, day) => {
-  const response = await api.delete(`/users/${userId}/calendars/${year}/dailies/${month}/${day}`);
+export const deleteDaily = async (year, month, day) => {
+  const response = await api.delete(`/calendar/${year}/daily/${month}/${day}`);
   return response.data;
 };
 
-export const deleteDailies = async (userId, year) => {
-  const response = await api.delete(`/users/${userId}/calendars/${year}/dailies`);
+export const deleteDailies = async (year) => {
+  const response = await api.delete(`/calendar/${year}/daily`);
   return response.data;
 };
 
-export const updateDaily = async (userId, year, month, day, dailyData) => {
-  const response = await api.patch(`/users/${userId}/calendars/${year}/dailies/${month}/${day}`, dailyData);
+export const updateDaily = async (year, month, day, dailyData) => {
+  const response = await api.patch(`/calendar/${year}/daily/${month}/${day}`, dailyData);
   return response.data;
 };

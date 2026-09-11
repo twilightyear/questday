@@ -1,4 +1,4 @@
-from fastapi import HTTPException, APIRouter, Depends
+from fastapi import HTTPException, APIRouter, Depends, Request
 from sqlalchemy import select
 from starlette import status
 from database.db_connection import get_db
@@ -16,19 +16,14 @@ router = APIRouter(tags = ["Todo"]) #Todo 라우터
 
 #전체 Todo 조회
 @router.get(
-    "/users/{user_id}/calendars/{year}/dailies/{month}/{day}/category/{category_id}/todo",
+    "/calendar/{year}/daily/{month}/{day}/category/{category_id}/todo",
     response_model = list[TodoResponse],
     status_code = status.HTTP_200_OK,
     summary = "전체 Todo 조회"
 )
-def get_todos_handler(user_id: int, year: int, month: int, day: int, category_id: int, session : Session = Depends(get_db)):
-    #존재하는 User 인지 검사 (404 NOT FOUND)
-    existing_user = session.execute(
-        select(User).where(User.user_id == user_id)
-    ).scalar_one_or_none()
-
-    if not existing_user:
-        raise NotFoundException("존재하지 않는 User 입니다.")
+def get_todos_handler(request: Request, year: int, month: int, day: int, category_id: int, session : Session = Depends(get_db)):
+    #Cookie 기반 User ID 받아오기
+    user_id = request.session.get("user_id")
     
     #존재하는 Calendar 인지 검사 (404 NOT FOUND)
     existing_calendar = session.execute(
@@ -75,19 +70,14 @@ def get_todos_handler(user_id: int, year: int, month: int, day: int, category_id
 
 #단일 Todo 생성
 @router.post(
-    "/users/{user_id}/calendars/{year}/dailies/{month}/{day}/category/{category_id}/todo",
+    "/calendar/{year}/daily/{month}/{day}/category/{category_id}/todo",
     response_model = TodoResponse,
     status_code = status.HTTP_201_CREATED,
     summary = "단일 Todo 생성"
 )
-def create_todo_handler(body: TodoCreateRequest, user_id: int, year: int, month: int, day: int, category_id: int, session : Session = Depends(get_db)):
-    #존재하는 User 인지 검사 (404 NOT FOUND)
-    existing_user = session.execute(
-        select(User).where(User.user_id == user_id)
-    ).scalar_one_or_none()
-
-    if not existing_user:
-        raise NotFoundException("존재하지 않는 User 입니다.")
+def create_todo_handler(request: Request, body: TodoCreateRequest, year: int, month: int, day: int, category_id: int, session : Session = Depends(get_db)):
+    #Cookie 기반 User ID 받아오기
+    user_id = request.session.get("user_id")
     
     #존재하는 Calendar 인지 검사 (404 NOT FOUND)
     existing_calendar = session.execute(
@@ -139,18 +129,13 @@ def create_todo_handler(body: TodoCreateRequest, user_id: int, year: int, month:
 
 #단일 Todo 삭제
 @router.delete(
-    "/users/{user_id}/calendars/{year}/dailies/{month}/{day}/category/{category_id}/todo/{todo_id}",
+    "/calendar/{year}/daily/{month}/{day}/category/{category_id}/todo/{todo_id}",
     status_code = status.HTTP_204_NO_CONTENT,
     summary = "단일 Todo 삭제"
 )
-def delete_todo_handler(user_id: int, year: int, month: int, day: int, category_id: int, todo_id: int, session : Session = Depends(get_db)):
-    #존재하는 User 인지 검사 (404 NOT FOUND)
-    existing_user = session.execute(
-        select(User).where(User.user_id == user_id)
-    ).scalar_one_or_none()
-
-    if not existing_user:
-        raise NotFoundException("존재하지 않는 User 입니다.")
+def delete_todo_handler(request: Request, year: int, month: int, day: int, category_id: int, todo_id: int, session : Session = Depends(get_db)):
+    #Cookie 기반 User ID 받아오기
+    user_id = request.session.get("user_id")
     
     #존재하는 Calendar 인지 검사 (404 NOT FOUND)
     existing_calendar = session.execute(
@@ -205,18 +190,13 @@ def delete_todo_handler(user_id: int, year: int, month: int, day: int, category_
 
 #전체 Todo 삭제
 @router.delete(
-    "/users/{user_id}/calendars/{year}/dailies/{month}/{day}/category/{category_id}/todo",
+    "/calendar/{year}/daily/{month}/{day}/category/{category_id}/todo",
     status_code = status.HTTP_204_NO_CONTENT,
     summary = "전체 Todo 삭제"
 )
-def delete_todos_handler(user_id: int, year: int, month: int, day: int, category_id: int, session : Session = Depends(get_db)):
-    #존재하는 User 인지 검사 (404 NOT FOUND)
-    existing_user = session.execute(
-        select(User).where(User.user_id == user_id)
-    ).scalar_one_or_none()
-
-    if not existing_user:
-        raise NotFoundException("존재하지 않는 User 입니다.")
+def delete_todos_handler(request: Request, year: int, month: int, day: int, category_id: int, session : Session = Depends(get_db)):
+    #Cookie 기반 User ID 받아오기
+    user_id = request.session.get("user_id")
     
     #존재하는 Calendar 인지 검사 (404 NOT FOUND)
     existing_calendar = session.execute(
@@ -272,19 +252,14 @@ def delete_todos_handler(user_id: int, year: int, month: int, day: int, category
 
 #단일 Todo 수정
 @router.patch(
-    "/users/{user_id}/calendars/{year}/dailies/{month}/{day}/category/{category_id}/todo/{todo_id}",
+    "/calendar/{year}/daily/{month}/{day}/category/{category_id}/todo/{todo_id}",
     response_model = TodoResponse,
     status_code = status.HTTP_200_OK,
     summary = "단일 Todo 수정"
 )
-def update_todo_handler(body: TodoUpdateRequest, user_id: int, year: int, month: int, day: int, category_id: int, todo_id: int, session : Session = Depends(get_db)):
-    #존재하는 User 인지 검사 (404 NOT FOUND)
-    existing_user = session.execute(
-        select(User).where(User.user_id == user_id)
-    ).scalar_one_or_none()
-
-    if not existing_user:
-        raise NotFoundException("존재하지 않는 User 입니다.")
+def update_todo_handler(body: TodoUpdateRequest, request: Request, year: int, month: int, day: int, category_id: int, todo_id: int, session : Session = Depends(get_db)):
+    #Cookie 기반 User ID 받아오기
+    user_id = request.session.get("user_id")
     
     #존재하는 Calendar 인지 검사 (404 NOT FOUND)
     existing_calendar = session.execute(

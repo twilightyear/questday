@@ -1,4 +1,4 @@
-from fastapi import APIRouter, status, HTTPException, Depends
+from fastapi import APIRouter, status, HTTPException, Depends, Request
 from sqlalchemy import select
 from database.db_connection import get_db
 from models.user import User
@@ -8,23 +8,19 @@ from schema.calendar.calendar_response import CalendarResponse
 from sqlalchemy.orm import Session
 from exceptions.handler import NotFoundException, ConflictException
 
+
 router = APIRouter(tags=["Calendar"])
 
 #전체 Calendar 조회
 @router.get(
-    "/users/{user_id}/calendars",
+    "/calendar",
     response_model = list[CalendarResponse],
     status_code = status.HTTP_200_OK,
     summary = "전체 Calendar 조회"
 )
-def get_calendars_handler(user_id: int, session : Session = Depends(get_db)):
-    #존재하는 User 인지 검사 (404 NOT FOUND)
-    existing_user = session.execute(
-        select(User).where(User.user_id == user_id)
-    ).scalar_one_or_none()
-
-    if not existing_user:
-        raise NotFoundException("존재하지 않는 User 입니다.")
+def get_calendars_handler(request: Request, session : Session = Depends(get_db)):
+    #Cookie 기반 User ID 받아오기
+    user_id = request.session.get("user_id")
     
     #존재하는 Calendar 인지 검사 (404 NOT FOUND)
     existing_calendars = session.execute(
@@ -40,19 +36,14 @@ def get_calendars_handler(user_id: int, session : Session = Depends(get_db)):
 
 #단일 Calendar 조회
 @router.get(
-    "/users/{user_id}/calendars/{year}",
+    "/calendar/{year}",
     response_model = CalendarResponse,
     status_code = status.HTTP_200_OK,
     summary = "단일 Calendar 조회"
 )
-def get_calendar_handler(user_id: int, year: int, session : Session = Depends(get_db)):
-    #존재하는 User 인지 검사 (404 NOT FOUND)
-    existing_user = session.execute(
-        select(User).where(User.user_id == user_id)
-    ).scalar_one_or_none()
-
-    if not existing_user:
-        raise NotFoundException("존재하지 않는 User 입니다.")
+def get_calendar_handler(request: Request, year: int, session : Session = Depends(get_db)):
+    #Cookie 기반 User ID 받아오기
+    user_id = request.session.get("user_id")
 
     #존재하는 Calendar 인지 검사 (404 NOT FOUND)
     existing_calendar = session.execute(
@@ -69,19 +60,14 @@ def get_calendar_handler(user_id: int, year: int, session : Session = Depends(ge
 
 #단일 Calendar 생성
 @router.post(
-    "/users/{user_id}/calendars",
+    "/calendars",
     response_model = CalendarResponse,
     status_code = status.HTTP_201_CREATED,
     summary = "단일 Calendar 생성"
 )
-def create_calendar_handler(body: CalendarCreateRequest, user_id: int, session : Session = Depends(get_db)):
-    #존재하는 User 인지 검사 (404 NOT FOUND)
-    existing_user = session.execute(
-        select(User).where(User.user_id == user_id)
-    ).scalar_one_or_none()
-
-    if not existing_user:
-        raise NotFoundException("존재하지 않는 User 입니다.")
+def create_calendar_handler(request: Request, body: CalendarCreateRequest, session : Session = Depends(get_db)):
+    #Cookie 기반 User ID 받아오기
+    user_id = request.session.get("user_id")
     
     #동일한 year 의 Calendar 가 존재하는지 중복 검사 (409 CONFLICT)
     existing_calendar = session.execute(
@@ -108,18 +94,13 @@ def create_calendar_handler(body: CalendarCreateRequest, user_id: int, session :
 
 #단일 Calendar 삭제
 @router.delete(
-    "/users/{user_id}/calendars/{year}",
+    "/calendar/{year}",
     status_code=status.HTTP_204_NO_CONTENT,
     summary = "단일 Calendar 삭제"
 )
-def delete_calendar_handler(year: int, user_id: int, session : Session = Depends(get_db)):
-    #존재하는 User 인지 검사 (404 NOT FOUND)
-    existing_user = session.execute(
-        select(User).where(User.user_id == user_id)
-    ).scalar_one_or_none()
-
-    if not existing_user:
-        raise NotFoundException("존재하지 않는 User 입니다.")
+def delete_calendar_handler(request: Request, year: int, session : Session = Depends(get_db)):
+    #Cookie 기반 User ID 받아오기
+    user_id = request.session.get("user_id")
 
     #존재하는 Calendar 인지 검사 (404 NOT FOUND)
     existing_calendar = session.execute(
@@ -140,18 +121,13 @@ def delete_calendar_handler(year: int, user_id: int, session : Session = Depends
 
 #전체 Calendar 삭제
 @router.delete(
-    "/users/{user_id}/calendars",
+    "/calendar",
     status_code=status.HTTP_204_NO_CONTENT,
     summary = "전체 Calendar 삭제"
 )
-def delete_calendars_handler(user_id: int, session : Session = Depends(get_db)):
-    #존재하는 User 인지 검사 (404 NOT FOUND)
-    existing_user = session.execute(
-        select(User).where(User.user_id == user_id)
-    ).scalar_one_or_none()
-
-    if not existing_user:
-        raise NotFoundException("존재하지 않는 User 입니다.")
+def delete_calendars_handler(request: Request, user_id: int, session : Session = Depends(get_db)):
+    #Cookie 기반 User ID 받아오기
+    user_id = request.session.get("user_id")
 
     #존재하는 Calendar 인지 검사 (404 NOT FOUND)
     existing_calendars = session.execute(

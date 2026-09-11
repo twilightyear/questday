@@ -1,4 +1,4 @@
-from fastapi import APIRouter, status, HTTPException, Depends
+from fastapi import APIRouter, status, HTTPException, Depends, Request
 from sqlalchemy import select
 from database.db_connection import get_db
 from models.user import User
@@ -13,19 +13,14 @@ router = APIRouter(tags=["Daily"])
 
 #전체 Daily 조회
 @router.get(
-    "/users/{user_id}/calendars/{year}/dailies",
+    "/calendar/{year}/daily",
     response_model = list[DailyResponse],
     status_code = status.HTTP_200_OK,
     summary = "전체 Daily 조회"
 )
-def get_dailies_handler(user_id: int, year: int, session : Session = Depends(get_db)):
-    #존재하는 User 인지 검사 (404 NOT FOUND)
-    existing_user = session.execute(
-        select(User).where(User.user_id == user_id)
-    ).scalar_one_or_none()
-
-    if not existing_user:
-        raise NotFoundException("존재하지 않는 User 입니다.")
+def get_dailies_handler(request: Request, year: int, session : Session = Depends(get_db)):
+    #Cookie 기반 User ID 받아오기
+    user_id = request.session.get("user_id")
 
     #존재하는 Calendar 인지 검사 (404 NOT FOUND)
     existing_calendar = session.execute(
@@ -49,19 +44,14 @@ def get_dailies_handler(user_id: int, year: int, session : Session = Depends(get
 
 #단일 Daily 조회
 @router.get(
-    "/users/{user_id}/calendars/{year}/dailies/{month}/{day}",
+    "/calendar/{year}/daily/{month}/{day}",
     response_model = DailyResponse,
     status_code = status.HTTP_200_OK,
     summary = "단일 Daily 조회"
 )
-def get_daily_handler(user_id: int, year: int, month: int, day: int, session : Session = Depends(get_db)):
-    #존재하는 User 인지 검사 (404 NOT FOUND)
-    existing_user = session.execute(
-        select(User).where(User.user_id == user_id)
-    ).scalar_one_or_none()
-
-    if not existing_user:
-        raise NotFoundException("존재하지 않는 User 입니다.")
+def get_daily_handler(request: Request, year: int, month: int, day: int, session : Session = Depends(get_db)):
+    #Cookie 기반 User ID 받아오기
+    user_id = request.session.get("user_id")
     
     #존재하는 Calendar 인지 검사 (404 NOT FOUND)
     existing_calendar = session.execute(
@@ -90,19 +80,14 @@ def get_daily_handler(user_id: int, year: int, month: int, day: int, session : S
 
 #단일 Daily 생성
 @router.post(
-    "/users/{user_id}/calendars/{year}/dailies",
+    "/calendar/{year}/daily",
     response_model = DailyResponse,
     status_code = status.HTTP_201_CREATED,
     summary = "단일 Daily 생성"
 )
-def create_daily_handler(body: DailyCreateRequest, user_id: int, year: int, session : Session = Depends(get_db)):
-    #존재하는 User 인지 검사 (404 NOT FOUND)
-    existing_user = session.execute(
-        select(User).where(User.user_id == user_id)
-    ).scalar_one_or_none()
-
-    if not existing_user:
-        raise NotFoundException("존재하지 않는 User 입니다.")
+def create_daily_handler(body: DailyCreateRequest, request: Request, year: int, session : Session = Depends(get_db)):
+    #Cookie 기반 User ID 받아오기
+    user_id = request.session.get("user_id")
     
     #존재하는 Calendar 인지 검사 (404 NOT FOUND)
     existing_calendar = session.execute(
@@ -142,18 +127,13 @@ def create_daily_handler(body: DailyCreateRequest, user_id: int, year: int, sess
 
 #단일 Daily 삭제
 @router.delete(
-    "/users/{user_id}/calendars/{year}/dailies/{month}/{day}",
+    "/calendar/{year}/daily/{month}/{day}",
     status_code=status.HTTP_204_NO_CONTENT,
     summary = "단일 Daily 삭제"
 )
-def delete_daily_handler(user_id: int, year: int, month: int, day: int, session : Session = Depends(get_db)):
-    #존재하는 User 인지 검사 (404 NOT FOUND)
-    existing_user = session.execute(
-        select(User).where(User.user_id == user_id)
-    ).scalar_one_or_none()
-
-    if not existing_user:
-        raise NotFoundException("존재하지 않는 User 입니다.")
+def delete_daily_handler(request: Request, year: int, month: int, day: int, session : Session = Depends(get_db)):
+    #Cookie 기반 User ID 받아오기
+    user_id = request.session.get("user_id")
 
     #존재하는 Calendar 인지 검사 (404 NOT FOUND)
     existing_calendar = session.execute(
@@ -186,18 +166,13 @@ def delete_daily_handler(user_id: int, year: int, month: int, day: int, session 
 
 #전체 Daily 삭제
 @router.delete(
-    "/users/{user_id}/calendars/{year}/dailies",
+    "/calendar/{year}/daily",
     status_code=status.HTTP_204_NO_CONTENT,
     summary = "전체 Daily 삭제"
 )
-def delete_dailies_handler(user_id: int, year: int, session : Session = Depends(get_db)):
-    #존재하는 User 인지 검사 (404 NOT FOUND)
-    existing_user = session.execute(
-        select(User).where(User.user_id == user_id)
-    ).scalar_one_or_none()
-
-    if not existing_user:
-        raise NotFoundException("존재하지 않는 User 입니다.")
+def delete_dailies_handler(request: Request, year: int, session : Session = Depends(get_db)):
+    #Cookie 기반 User ID 받아오기
+    user_id = request.session.get("user_id")
 
     #존재하는 Calendar 인지 검사 (404 NOT FOUND)
     existing_calendar = session.execute(
@@ -230,19 +205,14 @@ def delete_dailies_handler(user_id: int, year: int, session : Session = Depends(
 
 #단일 Daily 수정
 @router.patch(
-    "/users/{user_id}/calendars/{year}/dailies/{month}/{day}",
+    "/calendar/{year}/daily/{month}/{day}",
     response_model = DailyResponse,
     status_code = status.HTTP_200_OK,
     summary = "단일 Daily 수정"
 )
-def update_daily_handler(body: DailyUpdateRequest, user_id: int, year: int, month: int, day: int, session : Session = Depends(get_db)):
-    #존재하는 User 인지 검사 (404 NOT FOUND)
-    existing_user = session.execute(
-        select(User).where(User.user_id == user_id)
-    ).scalar_one_or_none()
-
-    if not existing_user:
-        raise NotFoundException("존재하지 않는 User 입니다.")
+def update_daily_handler(body: DailyUpdateRequest, request: Request, year: int, month: int, day: int, session : Session = Depends(get_db)):
+    #Cookie 기반 User ID 받아오기
+    user_id = request.session.get("user_id")
     
     #존재하는 Calendar 인지 검사 (404 NOT FOUND)
     existing_calendar = session.execute(

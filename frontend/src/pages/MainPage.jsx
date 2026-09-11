@@ -1,22 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import StreakGrid from '../components/StreakGrid';
-import { USER_ID } from '../constants/config';
 import { getCalendars } from '../apis/calendarApi';
 import { deleteTodo, createTodo, updateTodo } from '../apis/todoApi';
 import { deleteCategory, createCategory } from '../apis/categoryApi';
 import { createDaily, getDaily } from '../apis/dailyApi';
 import MonthCalendar from '../components/MonthCalendar';
 import DailyModal from '../components/DailyModal';
+import { userLogout } from '../apis/userApi';
+import { useNavigate } from 'react-router-dom';
 
 export default function MainPage() {
     const [calendarData, setCalendarData] = useState([]);
     const [selectedDate, setSelectedDate] = useState(null);
 
+    const navigate = useNavigate();
+
     //Calendar 데이터 받아오기 시도 로직
     const fetchCalendarData = async () => {
       try {
-        const response = await getCalendars(USER_ID);
+        const response = await getCalendars();
         setCalendarData(response);
       } catch (error) {
         console.error("[ Calendar API 에러 발생 ] : ", error);
@@ -30,7 +33,7 @@ export default function MainPage() {
 
     const handleDeleteTodo = async (year, month, day, categoryId, todoId) => {
       try {
-        await deleteTodo(USER_ID, year, month, day, categoryId, todoId);
+        await deleteTodo(year, month, day, categoryId, todoId);
         fetchCalendarData();
       } catch (err){
         console.log(err);
@@ -39,12 +42,21 @@ export default function MainPage() {
 
     const handleDeleteCategory = async (year, month, day, categoryId) => {
       try {
-        await deleteCategory(USER_ID, year, month, day, categoryId);
+        await deleteCategory(year, month, day, categoryId);
         fetchCalendarData();
       } catch (err){
         console.log(err);
       }
     };
+
+    const handleUserLogout = async () => {
+      try {
+        await userLogout();
+        navigate("/")
+      } catch (err){
+        console.log(err);
+      }
+    }
 
     const handleCreateCategory = async (year, month, day, body) => {
       try {
@@ -56,10 +68,10 @@ export default function MainPage() {
             month: Number(month),
             day: Number(day)
           };
-          await createDaily(USER_ID, year, dailyData);
+          await createDaily(year, dailyData);
         }
 
-        await createCategory(USER_ID, year, month, day, body);
+        await createCategory(year, month, day, body);
         fetchCalendarData();
       } catch (err){
         console.log(err);
@@ -68,7 +80,7 @@ export default function MainPage() {
 
     const handleCreateTodo = async (year, month, day, categoryId, body) => {
       try {
-        await createTodo(USER_ID, year, month, day, categoryId, body);
+        await createTodo(year, month, day, categoryId, body);
         fetchCalendarData();
       } catch (err){
         console.log(err);
@@ -94,7 +106,7 @@ export default function MainPage() {
           todoData.is_done = true;
         }
 
-        await updateTodo(USER_ID, year, month, day, categoryId, todoId, todoData);
+        await updateTodo(year, month, day, categoryId, todoId, todoData);
         fetchCalendarData();
       } catch (err){
         console.log(err);
@@ -161,7 +173,7 @@ return (
               설정
             </button>
 
-            <button className="flex-1 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-rose-400/80 hover:text-rose-400 py-2.5 rounded-xl text-xs font-semibold transition-colors">
+            <button onClick={handleUserLogout} className="flex-1 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-rose-400/80 hover:text-rose-400 py-2.5 rounded-xl text-xs font-semibold transition-colors">
               로그아웃
             </button>
           </div>
