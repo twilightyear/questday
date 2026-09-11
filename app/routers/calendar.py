@@ -60,7 +60,7 @@ def get_calendar_handler(request: Request, year: int, session : Session = Depend
 
 #단일 Calendar 생성
 @router.post(
-    "/calendars",
+    "/calendar",
     response_model = CalendarResponse,
     status_code = status.HTTP_201_CREATED,
     summary = "단일 Calendar 생성"
