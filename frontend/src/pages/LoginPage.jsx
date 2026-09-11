@@ -9,8 +9,9 @@ export default function LoginPage() {
 
   const isFormValid = email.trim() !== '' && password.trim() !== '';
 
-  const handleSignIn = async () => {
-    nagivate("/signIn")
+  const handleSignup = async (e) => {
+    e.preventDefault();
+    navigate("/signup");
   }
 
   const handleLogin = async (e) => {
@@ -74,10 +75,10 @@ export default function LoginPage() {
             로그인하기
           </button>
         </form>
-        <form onSubmit={handleSignIn} className="flex flex-col">
+        <form onSubmit={handleSignup} className="flex flex-col">
           <button
             type="submit"
-            className={'py-3 rounded-xl text-sm font-semibold mt-2 cursor-pointer border border-slate-800 bg-slate-600'}
+            className={'text-slate-300 py-3 rounded-xl text-sm font-semibold mt-2 cursor-pointer border border-slate-800 bg-slate-600 hover:bg-emerald-500 transition-colors'}
           >회원가입</button>
         </form>
         
