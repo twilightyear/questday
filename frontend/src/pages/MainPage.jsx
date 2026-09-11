@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import StreakGrid from '../components/StreakGrid';
-import { getCalendars } from '../apis/calendarApi';
+import { createCalendar, getCalendars } from '../apis/calendarApi';
 import { deleteTodo, createTodo, updateTodo } from '../apis/todoApi';
 import { deleteCategory, createCategory } from '../apis/categoryApi';
 import { createDaily, getDaily } from '../apis/dailyApi';
@@ -61,14 +61,28 @@ export default function MainPage() {
     const handleCreateCategory = async (year, month, day, body) => {
       try {
         const targetYear = calendarData.find((item) => item.year === year);
-        const targetDaily = targetYear?.dailies.find((d) => d.month === month && d.day === day);
+        if(!targetYear){
+          const yearData = {
+            year: year
+          }
+          try {
+            await createCalendar(yearData);
+          } catch(err){
+            console.log(err);
+          }
+        }
 
+        const targetDaily = targetYear?.dailies.find((d) => d.month === month && d.day === day);
         if(!targetDaily){
-          const dailyData = {
-            month: Number(month),
-            day: Number(day)
-          };
-          await createDaily(year, dailyData);
+          try {
+            const dailyData = {
+              month: Number(month),
+              day: Number(day)
+            };
+            await createDaily(dailyData);
+          } catch(err){
+            console.log(err);
+          }
         }
 
         await createCategory(year, month, day, body);
@@ -154,7 +168,7 @@ return (
                 <span className="text-slate-400">0%</span>
               </div>
               <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
-                <div className="bg-emerald-500 h-full w-0/4"></div>
+                <div className="bg-emerald-500 h-full w-0"></div>
               </div>
             </div>
           </div>
