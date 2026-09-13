@@ -6,7 +6,7 @@ import { getCalendar, createCalendar  } from '../apis/calendarApi';
 
 export function useLogin() {
   const [email, setEmail] = useState('');
-  const [passworㅓ렇d, setPassword] = useState('');
+  const [password, setPassword] = useState('');
 
   const navigate = useNavigate();
 
