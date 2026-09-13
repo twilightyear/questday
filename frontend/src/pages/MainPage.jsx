@@ -79,7 +79,7 @@ export default function MainPage() {
               month: Number(month),
               day: Number(day)
             };
-            await createDaily(dailyData);
+            await createDaily(year, dailyData);
           } catch(err){
             console.log(err);
           }
