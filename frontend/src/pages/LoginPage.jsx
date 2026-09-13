@@ -1,57 +1,25 @@
-import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { userLogin } from '../apis/userApi';
-import { getCurrentYear } from '../utils/util_functions';
-import { getCalendar, createCalendar  } from '../apis/calendarApi';
+import { useLogin } from '../hooks/useLogin';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+
+  //Login 페이지 Hook
+  const {
+    email,
+    password,
+    isFormValid,
+    setEmail,
+    setPassword,
+    handleLogin,
+  } = useLogin();
+
   const navigate = useNavigate();
 
-  const isFormValid = email.trim() !== '' && password.trim() !== '';
-
+  //Signup 페이지 이동
   const handleSignup = async (e) => {
     e.preventDefault();
     navigate("/signup");
   }
-
-  const checkCreateCalendar = async () => {
-    try {
-      await getCalendar(getCurrentYear());
-      return;
-    } catch (err) {
-      if (err.response && err.response.status === 404){
-        const yearData = {
-          year : getCurrentYear()
-        }
-        await createCalendar(yearData);
-        return;
-      }
-    }
-  };
-
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    if (!isFormValid) return;
-
-    try {
-      const userData = {
-        email : email,
-        password : password
-      }
-
-      const response = await userLogin(userData);
-
-      console.log("로그인 성공:", response.data);
-      await checkCreateCalendar()
-      navigate("/main");
-      
-    } catch (error) {
-      console.error("로그인 실패:", error);
-      alert("로그인에 실패했습니다. 아이디와 비밀번호를 확인해주세요.");
-    }
-  };
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-6">
