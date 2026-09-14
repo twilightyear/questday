@@ -73,6 +73,14 @@ return (
 					></div>
 				</div>
 				</div>
+				<div className="flex items-center justify-between bg-slate-950 px-3 py-2 rounded-lg mt-1">
+					<span className="text-xs text-slate-300 flex items-center gap-1.5">
+						보유 포인트 
+					</span>
+					<span className="font-mono font-semibold text-amber-400 px-2">
+						{currentPoint.toLocaleString()} P
+					</span>
+				</div>
 			</div>
 			{/* 리더보드 및 퀘스트 상점 */}
 			<div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg flex flex-col gap-2.5">

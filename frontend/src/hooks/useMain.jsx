@@ -39,7 +39,7 @@ export function useMain() {
 	const handleGetPoint = async () => {
 		try {
 			const response = await getUserPoint();
-			setCurrentPoint(response.data);
+			setCurrentPoint(response);
 		} catch (err) {
 			console.log(err);
 		}
@@ -48,7 +48,6 @@ export function useMain() {
 	const handleGetEmail = async () => {
 		try {
 			const response = await getUserEmail();
-			console.log(response);
 			setCurrentEmail(response);
 		} catch (err) {
 			console.log(err);
