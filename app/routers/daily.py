@@ -116,7 +116,8 @@ def create_daily_handler(body: DailyCreateRequest, request: Request, year: int, 
     daily = Daily(
         calendar_id = existing_calendar.calendar_id,
         month = body.month,
-        day = body.day
+        day = body.day,
+        is_rewarded = False
     )
 
     session.add(daily)

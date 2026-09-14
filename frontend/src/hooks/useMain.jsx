@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom';
 import { createCalendar, getCalendars } from '../apis/calendarApi';
 import { deleteTodo, createTodo, updateTodo } from '../apis/todoApi';
 import { deleteCategory, createCategory } from '../apis/categoryApi';
-import { createDaily, getDaily } from '../apis/dailyApi';
+import { createDaily } from '../apis/dailyApi';
+import { getUserPoint, getUserXp } from '../apis/userApi'
 import { userLogout } from '../apis/userApi';
 import { useNavigate } from 'react-router-dom';
 
@@ -11,6 +12,10 @@ import { useNavigate } from 'react-router-dom';
 export function useMain() {
     const [calendarData, setCalendarData] = useState([]);
     const [selectedDate, setSelectedDate] = useState(null);
+	const [currentXp, setCurrentXp] = useState(0);
+	const [currentPoint, setCurrentPoint] = useState(0);
+	const [currentLevel, setCurrentLevel] = useState(0);
+	const [currentPercentage, setCurrentPercentage] = useState(0);
 
     const navigate = useNavigate();
 
@@ -26,8 +31,30 @@ export function useMain() {
 
     useEffect(() => {
         fetchCalendarData();
+		handleGetPoint();
+		handleGetXp();
     }, []);
 
+	const handleGetPoint = async () => {
+		try {
+			const response = await getUserPoint();
+			setCurrentPoint(response.data);
+		} catch (err) {
+			console.log(err);
+		}
+	}
+
+	const handleGetXp = async () => {
+		try {
+			const response = await getUserXp();
+			setCurrentXp(response);
+			setCurrentLevel(Math.floor(response / 100));
+			setCurrentPercentage(response % 100);
+
+		} catch (err) {
+			console.log(err);
+		}
+	}
 
     const handleDeleteTodo = async (year, month, day, categoryId, todoId) => {
 		try {
@@ -120,6 +147,8 @@ export function useMain() {
 
 			await updateTodo(year, month, day, categoryId, todoId, todoData);
 			fetchCalendarData();
+			handleGetPoint();
+			handleGetXp();
 		} catch (err){
 			console.log(err);
 		}
@@ -136,6 +165,9 @@ export function useMain() {
 		handleUserLogout,
 		handleCreateCategory,
 		handleCreateTodo,
-		handleUpdateTodoIsDone
+		handleUpdateTodoIsDone,
+		currentLevel,
+		currentPoint,
+		currentPercentage
     };
 }

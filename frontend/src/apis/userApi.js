@@ -13,4 +13,14 @@ export const userLogout = async () => {
 export const userSignup = async (userData) => {
   const response = await api.post('/user/signup', userData);
   return response.data;
-}
+};
+
+export const getUserPoint = async () => {
+  const response = await api.get('/user/point');
+  return response.data;
+};
+
+export const getUserXp = async () => {
+  const response = await api.get('/user/xp');
+  return response.data;
+};

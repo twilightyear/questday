@@ -19,7 +19,10 @@ export default function MainPage() {
 		handleUserLogout,
 		handleCreateCategory,
 		handleCreateTodo,
-		handleUpdateTodoIsDone
+		handleUpdateTodoIsDone,
+		currentLevel,
+		currentPoint,
+		currentPercentage
     } = useMain();
 
 return (
@@ -59,11 +62,14 @@ return (
 				{/* 레벨 바 */}
 				<div className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3">
 				<div className="flex justify-between text-xs font-mono mb-1.5">
-					<span className="text-emerald-400">LV. 0</span>
-					<span className="text-slate-400">0%</span>
+					<span className="text-emerald-400">LV. {currentLevel}</span>
+					<span className="text-slate-400">{currentPercentage}%</span>
 				</div>
 				<div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
-					<div className="bg-emerald-500 h-full w-0"></div>
+					<div 
+						className="bg-emerald-500 h-full transition-all duration-300" 
+						style={{ width: `${currentPercentage}%` }}
+					></div>
 				</div>
 				</div>
 			</div>

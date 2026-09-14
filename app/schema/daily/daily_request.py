@@ -7,3 +7,4 @@ class DailyCreateRequest(BaseModel):
 class DailyUpdateRequest(BaseModel):
     month: int | None = None
     day: int | None = None
+    is_rewarded: bool | None = None
