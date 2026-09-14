@@ -24,3 +24,8 @@ export const getUserXp = async () => {
   const response = await api.get('/user/xp');
   return response.data;
 };
+
+export const getUserEmail = async () => {
+  const response = await api.get('/user/email');
+  return response.data;
+};

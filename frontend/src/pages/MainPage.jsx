@@ -22,7 +22,8 @@ export default function MainPage() {
 		handleUpdateTodoIsDone,
 		currentLevel,
 		currentPoint,
-		currentPercentage
+		currentPercentage,
+		currentEmail
     } = useMain();
 
 return (
@@ -57,7 +58,7 @@ return (
 				</div>
 				{/* 닉네임 */}
 				<div className="font-bold text-slate-200 text-lg">
-				닉네임
+				{currentEmail}
 				</div>
 				{/* 레벨 바 */}
 				<div className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3">
