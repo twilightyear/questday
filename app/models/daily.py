@@ -19,6 +19,8 @@ class Daily(Base):
 
     day: Mapped[int] = mapped_column()
 
+    is_rewarded: Mapped[bool] = mapped_column()
+
     __table_args__ = (
         UniqueConstraint("calendar_id", "month", "day", name="uq_calendar_daily_date"),
     )

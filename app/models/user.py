@@ -25,6 +25,16 @@ class User(Base):
         nullable = False
     )
 
+    xp: Mapped[int] = mapped_column(
+        Integer,
+        nullable = False
+    )
+
+    point: Mapped[int] = mapped_column(
+        Integer,
+        nullable = False
+    )
+
     created_at: Mapped[datetime] = mapped_column(
         DateTime,
         server_default = func.now(),

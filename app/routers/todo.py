@@ -11,6 +11,7 @@ from schema.todo.todo_request import TodoCreateRequest, TodoUpdateRequest
 from schema.todo.todo_response import TodoResponse
 from sqlalchemy.orm import Session
 from exceptions.handler import NotFoundException
+from services.user_service import check_user_xp_and_point
 
 router = APIRouter(tags = ["Todo"]) #Todo 라우터
 
@@ -312,6 +313,9 @@ def update_todo_handler(body: TodoUpdateRequest, request: Request, year: int, mo
     existing_todo.is_done = body.is_done
 
     session.commit()
+
+    check_user_xp_and_point(user_id, session, existing_daily.daily_id)
+
     session.refresh(existing_todo)
 
     return existing_todo
