@@ -9,7 +9,8 @@ export default function MonthCalendar({calendarData, onSelectedDate}){
     const [year, setYear] = useState(currentYear);
     const [month, setMonth] = useState(currentMonth);
 
-
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
     const daysOfWeek = ['일','월','화','수','목','금','토'];
 
     //이전 달로 달력을 넘기는 버튼 로직
@@ -123,7 +124,34 @@ export default function MonthCalendar({calendarData, onSelectedDate}){
                 {daysArray.map((day) => {
                     const dateKey = `${month}-${day}`;
                     const todoCount = dailyMap[dateKey] || 0;
-                    const colorClass = getStreakColor(todoCount);
+                    let colorClass = "";
+
+                    const slotDate = new Date(year, month-1, day);
+                    slotDate.setHours(0, 0, 0, 0);
+
+                    const timeDiff = slotDate.getTime();
+                    const todayTime = today.getTime();
+
+                    if (timeDiff < todayTime) {
+                        //과거 날짜
+                        if (todoCount > 0) {
+                            colorClass = 'bg-emerald-950/40 border-emerald-800/60 text-emerald-300 hover:bg-emerald-900/50';
+                        } else {
+                            colorClass = 'bg-rose-950/30 border-rose-900/50 text-rose-400 hover:bg-rose-900/40';
+                        }
+                    } else if (timeDiff === todayTime) {
+                        //오늘 날짜
+                        if (todoCount > 0) {
+                            colorClass = 'bg-emerald-950/40 border-emerald-800/60 text-emerald-300 hover:bg-emerald-900/50';
+                        } else {
+                            colorClass = 'bg-indigo-950/60 border-indigo-500 text-indigo-200 shadow-sm shadow-indigo-500/10 hover:bg-indigo-900/60';
+                        }
+                    } else {
+                        //미래 날짜
+                        colorClass = 'bg-slate-900 border-slate-800/80 text-slate-300 hover:border-slate-700 hover:bg-slate-850';
+                    }
+
+                    
                     
 
                     //각 Daily 박스 생성 로직
