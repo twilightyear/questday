@@ -129,3 +129,25 @@ def get_user_email(request: Request, session: Session = Depends(get_db)):
         raise NotFoundException("사용자가 존재하지 않습니다.")
 
     return existing_user.email
+
+
+#User 반환 API
+@router.get(
+    "/user/created_at",
+    status_code = status.HTTP_200_OK
+)
+def get_user_created_at(request: Request, session: Session = Depends(get_db)):
+    #Cookie 기반 User ID 받아오기
+    user_id = request.session.get("user_id")
+
+    #존재하는 User 인지 검사 (404 NOT FOUND)
+    existing_user = session.execute(
+        select(User).where(
+            User.user_id == user_id
+        )
+    ).scalar_one_or_none()
+
+    if not existing_user:
+        raise NotFoundException("사용자가 존재하지 않습니다.")
+
+    return existing_user.created_at

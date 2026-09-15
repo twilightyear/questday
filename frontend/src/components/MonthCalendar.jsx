@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { getCurrentYear, getCurrentMonth } from '../utils/util_functions';
 
-export default function MonthCalendar({calendarData, onSelectedDate}){
+export default function MonthCalendar({calendarData, onSelectedDate, userCreatedAt}){
     const currentYear = getCurrentYear();
     const currentMonth = getCurrentMonth();
 
     //useState를 사용한 year, month 값 관리 로직
     const [year, setYear] = useState(currentYear);
     const [month, setMonth] = useState(currentMonth);
+
+    const userCreatedDate = userCreatedAt ? new Date(userCreatedAt) : null;
+    if (userCreatedDate) {
+        userCreatedDate.setHours(0, 0, 0, 0);
+    }
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -132,20 +137,22 @@ export default function MonthCalendar({calendarData, onSelectedDate}){
                     const timeDiff = slotDate.getTime();
                     const todayTime = today.getTime();
 
+                    const createdTime = userCreatedDate ? userCreatedDate.getTime() : null;
                     if (timeDiff < todayTime) {
                         //과거 날짜
-                        if (todoCount > 0) {
-                            colorClass = 'bg-emerald-950/40 border-emerald-800/60 text-emerald-300 hover:bg-emerald-900/50';
+                        const isBeforeCreation = createdTime != null && timeDiff < createdTime;
+                        if (isBeforeCreation) {
+                            colorClass = 'bg-slate-900/40 border-slate-800/50 text-slate-600';
                         } else {
-                            colorClass = 'bg-rose-950/30 border-rose-900/50 text-rose-400 hover:bg-rose-900/40';
+                            if (todoCount > 0) {
+                                colorClass = 'bg-emerald-950/40 border-emerald-800/60 text-emerald-300 hover:bg-emerald-900/50';
+                            } else {
+                                colorClass = 'bg-rose-950/30 border-rose-900/50 text-rose-400 hover:bg-rose-900/40';
+                            }
                         }
                     } else if (timeDiff === todayTime) {
                         //오늘 날짜
-                        if (todoCount > 0) {
-                            colorClass = 'bg-emerald-950/40 border-emerald-800/60 text-emerald-300 hover:bg-emerald-900/50';
-                        } else {
-                            colorClass = 'bg-indigo-950/60 border-indigo-500 text-indigo-200 shadow-sm shadow-indigo-500/10 hover:bg-indigo-900/60';
-                        }
+                        colorClass = 'bg-indigo-950/60 border-indigo-500 text-indigo-200 shadow-sm shadow-indigo-500/10 hover:bg-indigo-900/60';
                     } else {
                         //미래 날짜
                         colorClass = 'bg-slate-900 border-slate-800/80 text-slate-300 hover:border-slate-700 hover:bg-slate-850';
