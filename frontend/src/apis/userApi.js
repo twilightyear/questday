@@ -29,3 +29,8 @@ export const getUserEmail = async () => {
   const response = await api.get('/user/email');
   return response.data;
 };
+
+export const getUserCreatedAt = async () => {
+  const response = await api.get('/user/created_at');
+  return response.data;
+}

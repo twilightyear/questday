@@ -11,11 +11,20 @@ export default function DailyModal({ calendarData, selectedDate, onClose , onDel
 
     const { year, month, day } = selectedDate;
 
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const selectedDateObj = new Date(year, month-1, day);
+    const isFuture = selectedDateObj > today;
+
     const targetYearData = calendarData.find((item) => item.year === year);
     const targetDailyData = targetYearData ? targetYearData.dailies.find((daily) => daily.month === month && daily.day === day) : null;
 
     //Modal 내부 카테고리 생성 로직
     const handleCategoryCreateSubmit = () => {
+        if (!isFuture){
+            alert("수정기한이 지났습니다.");
+            return;
+        }
         if (!newCategoryTitle.trim()) {
             setIsAddingCategory(false);
             setNewCategoryTitle("");
@@ -34,6 +43,10 @@ export default function DailyModal({ calendarData, selectedDate, onClose , onDel
 
     //Modal Category 내부 Todo 생성 로직
     const handleTodoCreateSubmit = (categoryId) => {
+        if (!isFuture){
+            alert("수정기한이 지났습니다.");
+            return;
+        }
         if (!newTodoContent.trim()) {
             setIsAddingTodo(null);
             setNewTodoTitle("");
@@ -91,10 +104,10 @@ export default function DailyModal({ calendarData, selectedDate, onClose , onDel
                                         value={newTodoContent}
                                         onChange={(e) => setNewTodoContent(e.target.value)}
                                         onKeyDown={(e) => {
+                                            if (e.nativeEvent.isComposing) return;
                                             if(e.key === "Enter") handleTodoCreateSubmit(category.category_id);
                                             if(e.key === "Escape") setIsAddingTodo(null);
                                         }}
-                                        onBlur={handleTodoCreateSubmit}
                                         placeholder = "할일을 입력하세요."
                                         className="bg-slate-900 text-slate-100 px-3 py-1.5 rounded-xl text-sm border border-slate-700 outline-none w-full text-center"
                                     />
@@ -117,10 +130,10 @@ export default function DailyModal({ calendarData, selectedDate, onClose , onDel
                             value={newCategoryTitle}
                             onChange={(e) => setNewCategoryTitle(e.target.value)}
                             onKeyDown={(e) => {
+                                if (e.nativeEvent.isComposing) return;
                                 if(e.key === "Enter") handleCategoryCreateSubmit();
                                 if(e.key === "Escape") setIsAddingCategory(false);
                             }}
-                            onBlur={handleCategoryCreateSubmit}
                             placeholder = "카테고리명을 입력하세요."
                             className="bg-slate-900 text-slate-100 px-3 py-1.5 rounded-xl text-sm border border-slate-700 outline-none w-full text-center"
                         />

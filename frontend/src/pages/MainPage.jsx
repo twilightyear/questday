@@ -23,7 +23,8 @@ export default function MainPage() {
 		currentLevel,
 		currentPoint,
 		currentPercentage,
-		currentEmail
+		currentEmail,
+		userCreatedAt
     } = useMain();
 
 return (
@@ -44,6 +45,7 @@ return (
 				<MonthCalendar 
 				calendarData={calendarData}
 				onSelectedDate={(year, month, day) => setSelectedDate({year, month, day})}
+				userCreatedAt={userCreatedAt}
 				/>
 			</div>
 			</div>

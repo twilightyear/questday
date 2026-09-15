@@ -4,7 +4,7 @@ import { createCalendar, getCalendars } from '../apis/calendarApi';
 import { deleteTodo, createTodo, updateTodo } from '../apis/todoApi';
 import { deleteCategory, createCategory } from '../apis/categoryApi';
 import { createDaily } from '../apis/dailyApi';
-import { getUserPoint, getUserXp, getUserEmail, userLogout } from '../apis/userApi'
+import { getUserPoint, getUserXp, getUserEmail, userLogout, getUserCreatedAt } from '../apis/userApi'
 import { useNavigate } from 'react-router-dom';
 
 //hook 마저 끝내야함!
@@ -16,6 +16,7 @@ export function useMain() {
 	const [currentLevel, setCurrentLevel] = useState(0);
 	const [currentPercentage, setCurrentPercentage] = useState(0);
 	const [currentEmail, setCurrentEmail] = useState("");
+	const [userCreatedAt, setUserCreatedAt] = useState(null);
 
     const navigate = useNavigate();
 
@@ -34,6 +35,7 @@ export function useMain() {
 		handleGetPoint();
 		handleGetXp();
 		handleGetEmail();
+		handleUserCreatedAt();
     }, []);
 
 	const handleGetPoint = async () => {
@@ -62,6 +64,15 @@ export function useMain() {
 			setCurrentPercentage(response % 100);
 
 		} catch (err) {
+			console.log(err);
+		}
+	}
+
+	const handleUserCreatedAt = async () => {
+		try {
+			const response = await getUserCreatedAt();
+			setUserCreatedAt(response);
+		} catch (err){
 			console.log(err);
 		}
 	}
@@ -179,6 +190,7 @@ export function useMain() {
 		currentLevel,
 		currentPoint,
 		currentPercentage,
-		currentEmail
+		currentEmail,
+		userCreatedAt
     };
 }
