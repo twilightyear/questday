@@ -129,7 +129,7 @@ export default function MonthCalendar({calendarData, onSelectedDate}){
                     return (
                         <div 
                             onClick={() => handleClickDate(day)}
-                            key={day} 
+                            key={dateKey} 
                             className={`h-14 border rounded-xl flex flex-col justify-between p-2 transition-all cursor-pointer ${colorClass}`}
                         >
                             <span className="text-xs font-semibold">{day}</span>
