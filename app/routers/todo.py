@@ -12,6 +12,7 @@ from schema.todo.todo_response import TodoResponse
 from sqlalchemy.orm import Session
 from exceptions.handler import NotFoundException
 from services.user_service import check_user_xp_and_point
+from datetime import date
 
 router = APIRouter(tags = ["Todo"]) #Todo 라우터
 
@@ -114,6 +115,13 @@ def create_todo_handler(request: Request, body: TodoCreateRequest, year: int, mo
     if not existing_category:
         raise NotFoundException("존재하지 않는 Category 입니다.")
 
+    #날짜상 허용되지 않는 수정인지 확인
+    today = date.today()
+    target_date = date(year,month,day)
+    if target_date <= today:
+        raise HTTPException(status_code=400, detail="오늘을 포함한 이전의 Daily 는 수정할 수 없습니다.")
+
+
     #Todo 추가
     todo = Todo(
         category_id = existing_category.category_id,
@@ -183,6 +191,13 @@ def delete_todo_handler(request: Request, year: int, month: int, day: int, categ
     if not existing_todo:
         raise NotFoundException("존재하지 않는 Todo 입니다.")
 
+    #날짜상 허용되지 않는 수정인지 확인
+    today = date.today()
+    target_date = date(year,month,day)
+    if target_date <= today:
+        raise HTTPException(status_code=400, detail="오늘을 포함한 이전의 Daily 는 수정할 수 없습니다.")
+
+
     #할일 삭제
     session.delete(existing_todo)
     session.commit()
@@ -242,6 +257,13 @@ def delete_todos_handler(request: Request, year: int, month: int, day: int, cate
 
     if not existing_todos:
         raise NotFoundException("존재하지 않는 Todo 입니다.")
+
+    #날짜상 허용되지 않는 수정인지 확인
+    today = date.today()
+    target_date = date(year,month,day)
+    if target_date <= today:
+        raise HTTPException(status_code=400, detail="오늘을 포함한 이전의 Daily 는 수정할 수 없습니다.")
+
 
     #Todo 삭제
     for todo in existing_todos:
@@ -306,6 +328,13 @@ def update_todo_handler(body: TodoUpdateRequest, request: Request, year: int, mo
 
     if not existing_todo:
         raise NotFoundException("존재하지 않는 Todo 입니다.")
+
+    #날짜상 허용되지 않는 수정인지 확인
+    today = date.today()
+    target_date = date(year,month,day)
+    if target_date <= today:
+        raise HTTPException(status_code=400, detail="오늘을 포함한 이전의 Daily 는 수정할 수 없습니다.")
+
 
     #할일 수정
     existing_todo.title = body.title

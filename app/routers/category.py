@@ -10,6 +10,7 @@ from schema.category.category_request import CategoryCreateRequest, CategoryUpda
 from schema.category.category_response import CategoryResponse
 from sqlalchemy.orm import Session
 from exceptions.handler import NotFoundException, ConflictException
+from datetime import date
 
 router = APIRouter(tags = ["Category"]) #Category 라우터
 
@@ -148,6 +149,12 @@ def create_category_handler(body: CategoryCreateRequest, request: Request, year:
     if existing_category:
         raise ConflictException("이미 존재하는 Category 입니다.")
 
+    #날짜상 허용되지 않는 수정인지 확인
+    today = date.today()
+    target_date = date(year,month,day)
+    if target_date <= today:
+        raise HTTPException(status_code=400, detail="오늘을 포함한 이전의 Daily 는 수정할 수 없습니다.")
+
     #Category 생성
     category = Category(
         daily_id = existing_daily.daily_id,
@@ -205,6 +212,13 @@ def delete_category_handler(request: Request, year: int, month: int, day: int, c
     if not existing_category:
         raise NotFoundException("존재하지 않는 Category입니다.")
 
+    #날짜상 허용되지 않는 수정인지 확인
+    today = date.today()
+    target_date = date(year,month,day)
+    if target_date <= today:
+        raise HTTPException(status_code=400, detail="오늘을 포함한 이전의 Daily 는 수정할 수 없습니다.")
+
+
     #Category 삭제
     session.delete(existing_category)
     session.commit()
@@ -258,6 +272,13 @@ def delete_categories_handler(request: Request, year: int, month: int, day: int,
     for category in existing_categories:
         session.delete(category)
 
+    #날짜상 허용되지 않는 수정인지 확인
+    today = date.today()
+    target_date = date(year,month,day)
+    if target_date <= today:
+        raise HTTPException(status_code=400, detail="오늘을 포함한 이전의 Daily 는 수정할 수 없습니다.")
+
+
     session.commit()
 
     return None 
@@ -306,6 +327,13 @@ def update_category_handler(body: CategoryUpdateRequest, request: Request, year:
 
     if not existing_category:
         raise NotFoundException("존재하지 않는 Category 입니다.")
+
+    #날짜상 허용되지 않는 수정인지 확인
+    today = date.today()
+    target_date = date(year,month,day)
+    if target_date <= today:
+        raise HTTPException(status_code=400, detail="오늘을 포함한 이전의 Daily 는 수정할 수 없습니다.")
+
 
     #Category 수정
     existing_category.title = body.title

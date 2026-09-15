@@ -124,6 +124,7 @@ export default function MonthCalendar({calendarData, onSelectedDate}){
                     const dateKey = `${month}-${day}`;
                     const todoCount = dailyMap[dateKey] || 0;
                     const colorClass = getStreakColor(todoCount);
+                    
 
                     //각 Daily 박스 생성 로직
                     return (
