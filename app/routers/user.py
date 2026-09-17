@@ -66,9 +66,9 @@ def logout_user_handler(request: Request):
     request.session.clear()
     return {"message":"로그아웃에 성공했습니다."}
 
-
+#User 데이터 반환
 @router.get(
-    "/user/xp",
+    "/user/data",
     status_code = status.HTTP_200_OK
 )
 def get_user_xp(request: Request, session: Session = Depends(get_db)):
@@ -85,69 +85,4 @@ def get_user_xp(request: Request, session: Session = Depends(get_db)):
     if not existing_user:
         raise NotFoundException("사용자가 존재하지 않습니다.")
 
-    return existing_user.xp
-
-
-@router.get(
-    "/user/point",
-    status_code = status.HTTP_200_OK
-)
-def get_user_point(request: Request, session: Session = Depends(get_db)):
-    #Cookie 기반 User ID 받아오기
-    user_id = request.session.get("user_id")
-
-    #존재하는 User 인지 검사 (404 NOT FOUND)
-    existing_user = session.execute(
-        select(User).where(
-            User.user_id == user_id
-        )
-    ).scalar_one_or_none()
-
-    if not existing_user:
-        raise NotFoundException("사용자가 존재하지 않습니다.")
-
-    return existing_user.point
-
-
-#Email 반환 API
-@router.get(
-    "/user/email",
-    status_code = status.HTTP_200_OK
-)
-def get_user_email(request: Request, session: Session = Depends(get_db)):
-    #Cookie 기반 User ID 받아오기
-    user_id = request.session.get("user_id")
-
-    #존재하는 User 인지 검사 (404 NOT FOUND)
-    existing_user = session.execute(
-        select(User).where(
-            User.user_id == user_id
-        )
-    ).scalar_one_or_none()
-
-    if not existing_user:
-        raise NotFoundException("사용자가 존재하지 않습니다.")
-
-    return existing_user.email
-
-
-#User 반환 API
-@router.get(
-    "/user/created_at",
-    status_code = status.HTTP_200_OK
-)
-def get_user_created_at(request: Request, session: Session = Depends(get_db)):
-    #Cookie 기반 User ID 받아오기
-    user_id = request.session.get("user_id")
-
-    #존재하는 User 인지 검사 (404 NOT FOUND)
-    existing_user = session.execute(
-        select(User).where(
-            User.user_id == user_id
-        )
-    ).scalar_one_or_none()
-
-    if not existing_user:
-        raise NotFoundException("사용자가 존재하지 않습니다.")
-
-    return existing_user.created_at
+    return existing_user
