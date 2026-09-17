@@ -115,7 +115,7 @@ def create_todo_handler(request: Request, body: TodoCreateRequest, year: int, mo
     if not existing_category:
         raise NotFoundException("존재하지 않는 Category 입니다.")
 
-    #날짜상 허용되지 않는 수정인지 확인
+    #날짜상 허용되지 않는 생성인지 확인
     today = date.today()
     target_date = date(year,month,day)
     if target_date <= today:
@@ -332,8 +332,8 @@ def update_todo_handler(body: TodoUpdateRequest, request: Request, year: int, mo
     #날짜상 허용되지 않는 수정인지 확인
     today = date.today()
     target_date = date(year,month,day)
-    if target_date <= today:
-        raise HTTPException(status_code=400, detail="오늘을 포함한 이전의 Daily 는 수정할 수 없습니다.")
+    if target_date < today:
+        raise HTTPException(status_code=400, detail="과거의 Daily 는 수정할 수 없습니다.")
 
 
     #할일 수정
