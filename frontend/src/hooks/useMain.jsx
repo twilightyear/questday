@@ -73,7 +73,22 @@ export function useMain() {
 	//Todo 삭제 Handler
     const handleDeleteTodo = async (year, month, day, categoryId, todoId) => {
 		try {
-			await deleteTodo(year, month, day, categoryId, todoId);
+
+			//현재 조회하는 Modal 의 날짜 데이터 설정
+			const selectedDateObj = new Date(year, month-1, day);
+
+			//현재 날짜 Datetime
+			const today = new Date();
+			today.setHours(0, 0, 0, 0);
+
+			//현재 Modal 의 날짜가 미래 Datetime 인지 확인
+			const isFuture = selectedDateObj > today;
+
+			if(!isFuture){
+				alert("수정기한이 지났습니다.");
+			} else {
+				await deleteTodo(year, month, day, categoryId, todoId);
+			}
 
 			//Calendar 정보 최신화
 			fetchCalendarData();
@@ -85,7 +100,22 @@ export function useMain() {
 	//Category 삭제 Handler
     const handleDeleteCategory = async (year, month, day, categoryId) => {
 		try {
-			await deleteCategory(year, month, day, categoryId);
+
+			//현재 조회하는 Modal 의 날짜 데이터 설정
+			const selectedDateObj = new Date(year, month-1, day);
+
+			//현재 날짜 Datetime
+			const today = new Date();
+			today.setHours(0, 0, 0, 0);
+
+			//현재 Modal 의 날짜가 미래 Datetime 인지 확인
+			const isFuture = selectedDateObj > today;
+
+			if(!isFuture){
+				alert("수정기한이 지났습니다.");
+			} else {
+				await deleteCategory(year, month, day, categoryId);
+			}
 
 			//Calendar 정보 최신화
 			fetchCalendarData();
@@ -141,7 +171,7 @@ export function useMain() {
 		}
 	};
 
-	//
+	//User Todo Toggle Handler
 	const handleToggleTodoIsDone = async (year, month, day, categoryId, todoId) => {
 		try{
 			//Todo Data Toggle 을 위한 targetTodo 값 조회
@@ -149,25 +179,39 @@ export function useMain() {
 			const targetDaily = targetYear?.dailies.find((d) => d.month === month && d.day === day);
 			const targetCategory = targetDaily?.categories.find((c) => c.category_id === categoryId);
 			const targetTodo = targetCategory?.todos.find((t) => t.todo_id === todoId)
-
-			//todoData 값 초기화
-			const todoData = {
-				title : targetTodo.title,
-				content : targetTodo.content,
-				is_done : null
-			}
-
-			//Todo is_done 토글 로직
-			targetTodo.is_done ? todoData.is_done = false : todoData.is_done = true;
-
-			//todoData 를 바탕으로 Todo 업데이트
-			await updateTodo(year, month, day, categoryId, todoId, todoData);
-
-			//Calendar 정보 최신화
-			fetchCalendarData();
 			
-			//User 정보 최신화
-			handleGetUserData();
+			//현재 조회하는 Modal 의 날짜 데이터 설정
+			const selectedDateObj = new Date(year, month-1, day);
+
+			//현재 날짜 Datetime
+			const today = new Date();
+			today.setHours(0, 0, 0, 0);
+
+			//현재 Modal 의 날짜가 오늘을 포함한 미래 Datetime 인지 확인
+			const isFuture = selectedDateObj >= today;
+			
+			if(!isFuture){
+				alert("수정기한이 지났습니다.");
+			} else {
+				//todoData 값 초기화
+				const todoData = {
+					title : targetTodo.title,
+					content : targetTodo.content,
+					is_done : null
+				}
+
+				//Todo is_done 토글 로직
+				targetTodo.is_done ? todoData.is_done = false : todoData.is_done = true;
+
+				//todoData 를 바탕으로 Todo 업데이트
+				await updateTodo(year, month, day, categoryId, todoId, todoData);
+
+				//Calendar 정보 최신화
+				fetchCalendarData();
+				
+				//User 정보 최신화
+				handleGetUserData();
+			}
 		} catch (err){
 			console.log("[ handleToggleTodoIsDone Exception ] : ", err);
 		}
