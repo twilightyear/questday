@@ -149,11 +149,11 @@ def create_category_handler(body: CategoryCreateRequest, request: Request, year:
     if existing_category:
         raise ConflictException("이미 존재하는 Category 입니다.")
 
-    #날짜상 허용되지 않는 수정인지 확인
+    #날짜상 허용되지 않는 생성인지 확인
     today = date.today()
     target_date = date(year,month,day)
     if target_date <= today:
-        raise HTTPException(status_code=400, detail="오늘을 포함한 이전의 Daily 는 수정할 수 없습니다.")
+        raise HTTPException(status_code=400, detail="오늘을 포함한 이전의 Daily 의 Category 는 생성할 수 없습니다.")
 
     #Category 생성
     category = Category(
@@ -215,8 +215,8 @@ def delete_category_handler(request: Request, year: int, month: int, day: int, c
     #날짜상 허용되지 않는 수정인지 확인
     today = date.today()
     target_date = date(year,month,day)
-    if target_date <= today:
-        raise HTTPException(status_code=400, detail="오늘을 포함한 이전의 Daily 는 수정할 수 없습니다.")
+    if target_date < today:
+        raise HTTPException(status_code=400, detail="과거의 Daily 의 Category 는 수정할 수 없습니다.")
 
 
     #Category 삭제
