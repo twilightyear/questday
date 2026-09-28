@@ -23,8 +23,7 @@ export function useSignup() {
         if(checkPassword === password){
             return true;
         } else {
-            setPassword('');
-            setCheckPassword('');
+            return false;
         }
     }
 
@@ -34,23 +33,26 @@ export function useSignup() {
 
         //모든 칸이 채워져있는지와, 패스워드와 패스워드 확인칸의 값이 같은지 확인
         if (!isFormValid || !isPasswordValid) return;
-        
-        try {
-            const userData = {
-            email : email,
-            password : password
-        }
-
-        const response = await userSignup(userData);
 
         //추가적인 새로고침 방지
         e.preventDefault();
+        
+        try {
+            const userData = {
+                email : email,
+                password : password
+            }
 
-        //성공시 Login 페이지로 이동
-        navigate("/");
+            const response = await userSignup(userData);
+
+            alert("회원가입에 성공했습니다. 다시 로그인해주세요.");
+
+            //성공시 Login 페이지로 이동
+            navigate("/");
       
-        } catch (error) {
+        } catch (err) {
             alert("회원가입에 실패했습니다. 아이디와 비밀번호를 확인해주세요.");
+            console.log("[ handleSignup 오류 발생 ] : ", err);
         }
     };
 

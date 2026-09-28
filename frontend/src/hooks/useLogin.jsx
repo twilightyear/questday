@@ -33,7 +33,7 @@ export function useLogin() {
             if (err.response && err.response.status === 404){
                 await handleCreateCalendar();
             } else {
-                console.error("[ handleCheckCalendarExist Exception ] : ", err);
+                console.error("[ handleCheckCalendarExist 오류 ] : ", err);
             }
         }
     };
@@ -47,7 +47,7 @@ export function useLogin() {
             
             await createCalendar(yearData);
         } catch (err) {
-            console.error("[ handleCreateCalendar Exception ] : ", err);
+            console.error("[ handleCreateCalendar 오류 ] : ", err);
         }
     }
 
@@ -76,7 +76,7 @@ export function useLogin() {
             navigate("/main");
         
         } catch (err) {
-            console.error("[ fetchCalendarData Exception ] : ", error);
+            console.error("[ fetchCalendarData 오류 ] : ", err);
             alert("로그인에 실패했습니다. 아이디와 비밀번호를 확인해주세요.");
         }
     };
