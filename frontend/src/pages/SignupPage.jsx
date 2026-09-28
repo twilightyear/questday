@@ -57,7 +57,7 @@ export default function SignupPage() {
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="비밀번호를 입력하세요"
                             className={`bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 ${
-                                isFormValid
+                                isPasswordValid
                                 ? 'focus:outline-none focus:border-emerald-500 text-sm'
                                 : 'focus:outline-none focus:border-rose-500 text-sm'
                             }`}
@@ -77,7 +77,7 @@ export default function SignupPage() {
                             }}
                             placeholder="비밀번호를 다시 입력하세요"
                             className={`bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 ${
-                                isFormValid
+                                isPasswordValid
                                 ? 'focus:outline-none focus:border-emerald-500 text-sm'
                                 : 'focus:outline-none focus:border-rose-500 text-sm'
                             }`}

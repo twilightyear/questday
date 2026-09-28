@@ -23,7 +23,7 @@ if not FRONTEND_URL:
     raise ValueError("FRONTEND_URL 환경 변수가 설정되지 않았습니다.")
 
 #데이터베이스 연결 및 동기화
-#Base.metadata.drop_all(bind=engine)
+Base.metadata.drop_all(bind=engine)
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
@@ -39,9 +39,9 @@ add_exception_handlers(app)
 
 app.add_middleware(
     SessionMiddleware,
-    secret_key=SECRET_KEY
+    secret_key=SECRET_KEY,
     same_site="none",
-    secure=True
+    https_only=True
 )
 
 app.add_middleware(
@@ -49,5 +49,5 @@ app.add_middleware(
     allow_origins=[FRONTEND_URL],
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"],
+    allow_headers=["*"]
 )
